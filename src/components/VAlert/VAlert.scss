@@ -1,0 +1,10 @@
+@import '../../scss/variables';
+@import '../../scss/mixins';
+
+.alert {
+  border-radius: $default-border-radius;
+  border: 1px solid $yellow-border-color;
+  background-color: $yellow-color;
+  padding: $half-spacer;
+  @include box-shadow()
+}
