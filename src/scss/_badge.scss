@@ -1,0 +1,12 @@
+.badge {
+  background-color: $yellow-color;
+  border-radius: $default-border-radius;
+  display: inline-block;
+  color: $brown-color;
+  font-size: $badge-font-size;
+  font-weight: bold;
+  padding: 0.3rem;
+  line-height: 1;
+  text-align: center;
+  vertical-align: baseline;
+}

@@ -1,0 +1,30 @@
+@mixin hover($color, $background) {
+  &:hover {
+    background-color: $background;
+    @if $color {
+      color: $color
+    }
+  }
+}
+
+@mixin flex($direction: null, $valign: null, $halign: null) {
+  display: flex;
+  @if $direction {
+    flex-direction: $direction;
+  }
+  @if $valign {
+    align-items: $valign;
+  }
+  @if $halign {
+    justify-content: $halign;
+  }
+}
+
+@mixin box-shadow($offsetx: 0, $offsety: 1px, $blur-radius: 2px, $color: rgba($black-color, .3)) {
+  box-shadow: $offsetx $offsetx $blur-radius $color;
+}
+
+@mixin text-overflow() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

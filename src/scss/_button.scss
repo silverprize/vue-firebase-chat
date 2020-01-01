@@ -1,0 +1,39 @@
+@import 'variables';
+@import 'mixins';
+
+@mixin button-style(
+  $color,
+  $background,
+  $border-color: $default-border-color,
+  $hover-background: darken($background, 10%)
+) {
+  color: $color;
+  background-color: $background;
+  border: 1px solid $border-color;
+  border-radius: $default-border-radius;
+
+  @include hover(null, $hover-background);
+}
+
+.button {
+  display: inline-block;
+  cursor: pointer;
+  line-height: $base-line-height;
+  text-align: center;
+  padding: $half-spacer $spacer $half-spacer $spacer;
+  vertical-align: middle;
+}
+
+.button {
+  &_light {
+    @include button-style($black-color, $light-color, null, $grey-color);
+  }
+
+  &_yellow {
+    @include button-style($brown-color, $yellow-color, $yellow-border-color, $yellow-border-color);
+  }
+
+  &_brown {
+    @include button-style($light-color, $brown-color, $brown-border-color, $brown-border-color);
+  }
+}

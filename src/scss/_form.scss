@@ -1,0 +1,13 @@
+.input-text {
+  border: 1px solid $default-border-color;
+  border-radius: $default-border-radius;
+  display: block;
+  padding: $half-spacer;
+  line-height: $base-line-height;
+  width: 100%;
+
+  &-label {
+    display: inline-block;
+    margin-bottom: $half-spacer;
+  }
+}
