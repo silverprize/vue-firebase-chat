@@ -1,5 +1,5 @@
 enum RouteNames {
-  Home = 'Home',
+  Main = 'Main',
   ChatRoomList = 'ChatRoomList',
   ChatRoom = 'ChatRoom',
 }

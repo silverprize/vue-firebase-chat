@@ -22,27 +22,32 @@
             @click="navigate"
           >
             {{ name }}
-            <span class="badge">👨‍👩‍👧‍👦0</span>
+            <VBadge>👨‍👩‍👧‍👦0</VBadge>
           </a>
         </router-link>
       </li>
     </ul>
-    <button
-      class="chat-rooms__btn_exit button button_yellow"
-      type="button"
+    <VButton
+      class="chat-rooms__btn_exit"
+      variant="yellow"
       @click="exit"
     >
       나가기
-    </button>
+    </VButton>
   </div>
 </template>
 
 <script lang="ts">
+import './PageChatRoomList.scss'
 import { Component, Vue } from 'vue-property-decorator'
 import RouteNames from '@/router/route-names'
+import VButton from '@/components/VButton/VButton.vue'
+import VBadge from '@/components/VBadge/VBadge.vue'
 
-@Component
-export default class ChatRooms extends Vue {
+@Component({
+  components: { VBadge, VButton },
+})
+export default class TheChatRooms extends Vue {
   readonly RouteNames = RouteNames
 
   roomList = [
@@ -53,36 +58,7 @@ export default class ChatRooms extends Vue {
   ]
 
   exit() {
-    this.$router.replace({ name: RouteNames.Home })
+    this.$router.replace({ name: RouteNames.Main })
   }
 }
 </script>
-
-<style lang="scss">
-.chat-rooms {
-  &-list {
-    list-style: none;
-    margin: 0;
-
-    &__item {
-      &:not(last-child) {
-        margin-bottom: $spacer / 4;
-      }
-
-      &-content {
-        border: 1px solid lighten($default-border-color, 20%);
-        border-radius: $default-border-radius;
-        background-color: $light-color;
-        align-items: center;
-        justify-content: space-between;
-        display: flex;
-        font-size: 1.2rem;
-        padding: $spacer;
-        cursor: pointer;
-        @include hover(null, $grey-color);
-        @include box-shadow();
-      }
-    }
-  }
-}
-</style>

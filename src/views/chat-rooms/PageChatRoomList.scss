@@ -1,0 +1,29 @@
+@import '../../scss/variables';
+@import '../../scss/mixins';
+
+.chat-rooms {
+  &-list {
+    list-style: none;
+    margin: 0;
+
+    &__item {
+      &:not(last-child) {
+        margin-bottom: $spacer / 4;
+      }
+
+      &-content {
+        border: 1px solid lighten($default-border-color, 20%);
+        border-radius: $default-border-radius;
+        background-color: $light-color;
+        align-items: center;
+        justify-content: space-between;
+        display: flex;
+        font-size: 1.2rem;
+        padding: $spacer;
+        cursor: pointer;
+        @include hover(null, $grey-color);
+        @include box-shadow();
+      }
+    }
+  }
+}

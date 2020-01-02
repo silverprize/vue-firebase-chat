@@ -1,0 +1,28 @@
+@import '../../scss/variables';
+@import '../../scss/mixins';
+
+.main {
+  @include flex(column, center, center);
+  position: relative;
+
+  &__logo {
+    border-radius: $default-border-radius;
+    margin-bottom: $spacer * 3;
+    width: 140px;
+    height: 140px;
+  }
+
+  &__form {
+    @include flex(column);
+    margin-top: $spacer * 2;
+
+    &-group {
+      margin-bottom: $half-spacer;
+    }
+  }
+
+  &__message {
+    position: absolute;
+    margin-top: 0.75rem;
+  }
+}

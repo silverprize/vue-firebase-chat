@@ -1,19 +1,21 @@
 <template>
-  <div class="page home">
+  <div class="page main">
     <img
-      class="logo"
-      src="../assets/kakao.jpg"
+      class="main__logo"
+      src="../../assets/kakao.jpg"
+      alt="Logo"
     >
-    <alert
+    <VAlert
       v-if="message"
-      :message="message"
-      class="home__message"
-    />
+      class="main__message"
+    >
+      {{ message }}
+    </VAlert>
     <form
-      class="form"
+      class="main__form"
       @submit.prevent=""
     >
-      <div class="form__chat-id">
+      <div class="main__form-group">
         <label
           class="input-text-label"
           for="chatId"
@@ -29,31 +31,33 @@
           autofocus
         >
       </div>
-      <button
-        class="button button_brown"
+      <VButton
         type="submit"
+        variant="brown"
         @click="connect"
       >
         접속
-      </button>
+      </VButton>
     </form>
   </div>
 </template>
 
 <script lang="ts">
+import './PageMain.scss'
 import { Component, Vue } from 'vue-property-decorator'
-import Alert from '@/components/Alert.vue'
 import RouteNames from '@/router/route-names'
-import Spinner from '@/components/Spinner.vue'
+import VAlert from '@/components/VAlert/VAlert.vue'
+import VSpinner from '@/components/VSpinner/VSpinner.vue'
+import VButton from '@/components/VButton/VButton.vue'
 
 @Component({
-  components: { Spinner, Alert },
+  components: { VButton, VSpinner, VAlert },
 })
-export default class Home extends Vue {
+export default class TheMain extends Vue {
   id: string = ''
   message: string = ''
 
-  connect () {
+  connect() {
     if (!this.id.trim()) {
       this.message = '아이디를 입력하세요.'
       return
@@ -64,30 +68,3 @@ export default class Home extends Vue {
   }
 }
 </script>
-
-<style lang="scss">
-.home {
-  align-items: center;
-  justify-content: center;
-  position: relative;
-
-  &__message {
-    position: absolute;
-    margin-top: 0.75rem;
-  }
-}
-.form {
-  @include flex(column);
-  margin-top: $spacer * 2;
-
-  &__chat-id {
-    margin-bottom: $half-spacer;
-  }
-}
-.logo {
-  border-radius: $default-border-radius;
-  margin-bottom: $spacer * 3;
-  width: 140px;
-  height: 140px;
-}
-</style>

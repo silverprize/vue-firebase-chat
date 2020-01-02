@@ -1,41 +1,23 @@
 <template>
   <div id="app">
     <router-view />
-    <div v-if="false" class="global-spinner">
-      <spinner />
+    <div
+      v-if="false"
+      class="global-spinner"
+    >
+      <VSpinner />
     </div>
   </div>
 </template>
 
 <script>
-import Spinner from '@/components/Spinner'
+import '@/scss/index.scss'
 import { Component, Vue } from 'vue-property-decorator'
+import VSpinner from '@/components/VSpinner/VSpinner.vue'
 
 @Component({
-  components: { Spinner },
+  components: { VSpinner },
 })
 export default class App extends Vue {
 }
 </script>
-
-<style lang="scss">
-@import './scss';
-
-html, body, #app {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-</style>
-
-<style lang="scss">
-.global-spinner {
-  @include flex(null, center, center);
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-}
-</style>

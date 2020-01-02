@@ -7,22 +7,22 @@ Vue.use(VueRouter)
 const routes: RouteConfig[] = [
   {
     path: '/',
-    name: RouteNames.Home,
-    component: () => import(/* webpackChunkName: "home" */ '@/views/Home.vue'),
+    name: RouteNames.Main,
+    component: () => import(/* webpackChunkName: "main" */ '@/views/main/PageMain.vue'),
   },
   {
     path: '/chat-rooms',
     name: RouteNames.ChatRoomList,
-    component: () => import(/* webpackChunkName: "chat-room-list" */ '@/views/ChatRoomList.vue'),
+    component: () => import(/* webpackChunkName: "chat-room-list" */ '@/views/chat-rooms/PageChatRoomList.vue'),
   },
   {
     path: '/chat-rooms/:id',
     name: RouteNames.ChatRoom,
-    component: () => import(/* webpackChunkName: "chat-room" */ '@/views/ChatRoom.vue'),
+    component: () => import(/* webpackChunkName: "chat-room" */ '@/views/chat-rooms/PageChatRoom.vue'),
   },
   {
     path: '*',
-    redirect: { name: 'home' },
+    redirect: { name: RouteNames.Main },
   },
 ]
 

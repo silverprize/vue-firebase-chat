@@ -2,16 +2,16 @@
   <div class="page">
     <h3 class="page__header chat-room__header">
       <span class="chat-room__title">
-        <span class="chat-room__title-badge badge">👨‍👩‍👧‍👦{{ countUsers }}</span>
+        <VBadge class="chat-room__title-badge">👨‍👩‍👧‍👦{{ countUsers }}</VBadge>
         <span class="chat-room__title-text">{{ chatRoomName }}</span>
       </span>
-      <button
-        type="button"
-        class="chat-room__exit-button button button_yellow"
+      <VButton
+        class="chat-room__exit-button"
+        variant="yellow"
         @click="exit()"
       >
         나가기
-      </button>
+      </VButton>
     </h3>
     <div class="page__content">
       <ul class="chat-room__list">
@@ -86,11 +86,16 @@
 </template>
 
 <script lang="ts">
+import './PageChatRoom.scss'
 import { Component, Vue } from 'vue-property-decorator'
 import RouteNames from '@/router/route-names'
+import VBadge from '@/components/VBadge/VBadge.vue'
+import VButton from '@/components/VButton/VButton.vue'
 
-@Component
-export default class Chat extends Vue {
+@Component({
+  components: { VButton, VBadge },
+})
+export default class TheChatRoom extends Vue {
   chatRoomName: string = 'roomroomroomroomroomroomroomroomroomroomroomroomroomroomroom'
   countUsers = 3
   messageList = [
@@ -124,164 +129,3 @@ export default class Chat extends Vue {
   }
 }
 </script>
-
-<style lang="scss">
-.chat-room {
-  @include flex(column);
-  padding: 0 $spacer;
-  line-height: $base-line-height;
-
-  &__header {
-    @include flex();
-  }
-
-  &__title {
-    @include flex(null, center, null);
-    @include text-overflow();
-
-    &-text {
-      @include text-overflow();
-    }
-    &-badge {
-      margin: 0 $spacer;
-      flex-shrink: 0;
-    }
-  }
-
-  &__exit-button {
-    margin: 0 $spacer;
-    flex-shrink: 0;
-  }
-
-  &__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  &__list-item {
-    @include flex(null, flex-start);
-    margin-bottom: $half-spacer;
-    margin-right: 40%;
-
-    &-me {
-      margin-right: 0;
-      margin-left: 40%;
-      flex-direction: row-reverse;
-    }
-  }
-}
-
-.balloon {
-  @include flex(null, flex-start);
-  flex: 1;
-
-  &_align {
-    &_right {
-      flex-direction: row-reverse;
-    }
-  }
-
-  &__arrow {
-    position: relative;
-    display: block;
-    width: .5rem;
-    height: 1rem;
-    flex-shrink: 0;
-
-    &::before,
-    &::after {
-      position: absolute;
-      display: block;
-      content: "";
-      border-color: transparent;
-      border-style: solid;
-    }
-
-    &_direction {
-      &_left {
-        &:after {
-          top: 3px;
-          left: 1px;
-          border-width: .1rem .7rem .7rem 0;
-          border-right-color: $light-color;
-        }
-      }
-
-      &_right {
-        &:after {
-          top: 3px;
-          right: 1px;
-          border-width: .1rem 0 .7rem .7rem;
-          border-left-color: $yellow-color;
-        }
-      }
-    }
-  }
-}
-.initial {
-  width: 35px;
-  height: 35px;
-  background-color: darken($grey-color, 33%);
-  color: $light-color;
-  border-radius: 20px;
-  @include flex(null, center, center);
-}
-.nickname {
-  margin-left: $half-spacer;
-  margin-bottom: $half-spacer / 2;
-  color: lighten($black-color, 30%);
-}
-.text {
-  background-color: $light-color;
-  padding: $half-spacer;
-  border-radius: $default-border-radius;
-  @include box-shadow(0, 0,.02rem, rgba($black-color, .3));
-
-  &_yellow {
-    background-color: $yellow-color;
-  }
-}
-.text-box {
-  &_align {
-    &_left {
-      margin-left: $half-spacer;
-    }
-  }
-}
-.chat-form {
-  background-color: $light-color;
-  border-top: 1px solid $default-border-color;
-  @include flex(column);
-
-  &__menu {
-    background-color: $grey-color;
-  }
-
-  &__input-area {
-    @include flex();
-    height: 100px;
-    position: relative;
-    border-top: 1px solid $grey-border-color;
-  }
-
-  &__input {
-    flex-grow: 1;
-    border: 0;
-    padding: 15px 100px 15px 15px;
-    resize: none;
-  }
-
-  &__send-button-container {
-    @include flex();
-    position: absolute;
-    height: 100%;
-    right: 0;
-  }
-
-  &__send-button {
-    margin: 12px;
-    width: 76px;
-  }
-}
-</style>
