@@ -1,16 +1,5 @@
-<template functional>
-  <div class="spinner" />
-</template>
+@import '../../scss/variables';
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-
-@Component
-export default class Spinner extends Vue {
-}
-</script>
-
-<style lang="scss">
 @keyframes spinner {
   to { transform: rotate(360deg); }
 }
@@ -24,4 +13,3 @@ export default class Spinner extends Vue {
   border-radius: 50%;
   animation: spinner .75s linear infinite;
 }
-</style>
