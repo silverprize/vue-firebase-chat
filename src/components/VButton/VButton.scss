@@ -1,5 +1,5 @@
-@import 'variables';
-@import 'mixins';
+@import '../../scss/variables';
+@import '../../scss/mixins';
 
 @mixin button-style(
   $color,
@@ -26,7 +26,7 @@
 
 .button {
   &_light {
-    @include button-style($black-color, $light-color, null, $grey-color);
+    @include button-style($black-color, $light-color, $default-border-color, $grey-color);
   }
 
   &_yellow {
