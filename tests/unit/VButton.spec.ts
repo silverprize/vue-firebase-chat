@@ -35,12 +35,6 @@ describe('VButton.vue', () => {
     console.info('classes', wrapper.classes())
     expect(wrapper.classes().find(c => c.includes(variant))).toBeTruthy()
   })
-
-  it('variant attribute 생략하면 variant="light"와 동일하다.', () => {
-    const wrapper = createVButton()
-    console.info('classes', wrapper.classes())
-    expect(wrapper.classes().find(c => c.includes('light'))).toBeTruthy()
-  })
 })
 
 function createVButton(args:{ className?: string, type?: string, variant?:string, label?: string } = {}) {

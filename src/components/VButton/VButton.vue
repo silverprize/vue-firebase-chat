@@ -1,7 +1,7 @@
 <template functional>
   <button
     class="button"
-    :class="[data.staticClass, data.class, `button_${props.variant || 'light'}`]"
+    :class="[data.staticClass, data.class, props.variant ? `button_${props.variant}` : '']"
     :type="data.attrs && data.attrs.type || 'button'"
     v-bind="data.attrs"
     v-on="listeners"

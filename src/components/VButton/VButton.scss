@@ -22,6 +22,17 @@
   text-align: center;
   padding: $half-spacer $spacer $half-spacer $spacer;
   vertical-align: middle;
+
+  &[disabled] {
+    color: $grey-text-color;
+    background-color: $grey-color;
+    border-color: $default-border-color;
+    cursor: default;
+
+    &:hover {
+      background-color: $grey-color;
+    }
+  }
 }
 
 .button {
