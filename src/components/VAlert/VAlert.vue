@@ -1,7 +1,7 @@
 <template functional>
   <div
     class="alert"
-    :class="data.staticClass"
+    :class="[data.staticClass, data.class]"
   >
     <slot />
   </div>

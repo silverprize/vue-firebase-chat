@@ -1,5 +1,8 @@
 <template functional>
-  <span class="badge">
+  <span
+    class="badge"
+    :class="[data.staticClass, data.class]"
+  >
     <slot />
   </span>
 </template>
