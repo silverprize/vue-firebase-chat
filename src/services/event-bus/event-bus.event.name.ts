@@ -1,0 +1,6 @@
+export const OPEN_INVITATION_DIALOG = 'eventBus.openInvitationDialog'
+export const OPEN_CONFIRM_INVITATION_DIALOG = 'eventBus.openConfirmInvitationDialog'
+export const FETCH_ROOM_LIST = 'eventBus.fetchRoomList'
+export const FETCH_PEOPLE_IN_ROOM = 'eventBus.fetchPeopleInRoom'
+export const FETCH_ROOM_INFO = 'eventBus.fetchRoomInfo'
+export const SEND_MESSAGE = 'eventBus.sendMessage'

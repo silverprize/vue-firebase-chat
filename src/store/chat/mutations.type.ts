@@ -1,0 +1,5 @@
+export const SET_ROOM_LIST = 'chat.setRoomList'
+export const SET_PEOPLE_IN_ROOM = 'chat.setPeopleInRoom'
+export const SET_ROOM = 'chat.setRoom'
+export const CLEAR = 'chat.clear'
+export const ADD_MESSAGE = 'chat.addMessage'

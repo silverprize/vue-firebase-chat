@@ -1,7 +1,7 @@
-enum RouteNames {
+enum RouteName {
   Main = 'Main',
   ChatRoomList = 'ChatRoomList',
   ChatRoom = 'ChatRoom',
 }
 
-export default RouteNames
+export default RouteName

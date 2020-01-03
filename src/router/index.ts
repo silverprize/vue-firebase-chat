@@ -1,28 +1,18 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import RouteNames from '@/router/route-names'
+import beforeEach from './beforeEach'
+import RouteName from '@/router/route.name'
+import main from '@/router/main'
+import chat from '@/router/chat'
 
 Vue.use(VueRouter)
 
 const routes: RouteConfig[] = [
-  {
-    path: '/',
-    name: RouteNames.Main,
-    component: () => import(/* webpackChunkName: "main" */ '@/views/main/PageMain.vue'),
-  },
-  {
-    path: '/chat-rooms',
-    name: RouteNames.ChatRoomList,
-    component: () => import(/* webpackChunkName: "chat-room-list" */ '@/views/chat-rooms/PageChatRoomList.vue'),
-  },
-  {
-    path: '/chat-rooms/:id',
-    name: RouteNames.ChatRoom,
-    component: () => import(/* webpackChunkName: "chat-room" */ '@/views/chat-rooms/PageChatRoom.vue'),
-  },
+  main,
+  chat,
   {
     path: '*',
-    redirect: { name: RouteNames.Main },
+    redirect: { name: RouteName.Main },
   },
 ]
 
@@ -31,5 +21,8 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 })
+
+// 서버 연결중이 아니면 아이디 입력으로 이동
+router.beforeEach(beforeEach)
 
 export default router

@@ -1,0 +1,53 @@
+@import '../../scss/variables';
+@import '../../scss/mixins';
+
+.chat-frame {
+  &-input-panel {
+    background-color: $light-color;
+    border-top: 1px solid $grey-border-color;
+    @include flex(column);
+
+    &__menu {
+      @include flex();
+      background-color: $grey-color;
+    }
+
+    &__menu-item {
+      display: inline-block;
+      cursor: pointer;
+      line-height: $base-line-height;
+      text-align: center;
+      padding: $half-spacer $spacer $half-spacer $spacer;
+
+      &:hover {
+        background-color: darken($grey-color, 5%);
+      }
+    }
+
+    &__input-area {
+      @include flex();
+      height: 100px;
+      position: relative;
+      border-top: 1px solid $grey-border-color;
+    }
+
+    &__input {
+      flex-grow: 1;
+      border: 0;
+      padding: 15px 100px 15px 15px;
+      resize: none;
+    }
+
+    &__send-button-container {
+      @include flex();
+      position: absolute;
+      height: 100%;
+      right: 0;
+    }
+
+    &__send-button {
+      margin: 12px;
+      width: 76px;
+    }
+  }
+}

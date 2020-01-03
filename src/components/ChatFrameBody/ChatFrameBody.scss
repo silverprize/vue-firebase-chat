@@ -1,0 +1,9 @@
+@import '../../scss/variables';
+@import '../../scss/mixins';
+
+.chat-frame {
+  &-body {
+    flex-grow: 1;
+    overflow: auto;
+  }
+}

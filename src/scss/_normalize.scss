@@ -10,7 +10,7 @@
   box-sizing: border-box;
 }
 
-html, body, button, input, textarea {
+html, body, button, input, textarea, select {
   font-size: $base-font-size;
   font-family: $base-font-family;
 }
@@ -20,6 +20,7 @@ a, button {
 }
 
 a {
+  color: $black-color;
   text-decoration: none;
   &:active, &:visited {
     color: inherit;

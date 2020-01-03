@@ -1,0 +1,45 @@
+@import '../../scss/variables';
+@import '../../scss/mixins';
+
+.dialog {
+  &-background {
+    @include flex(column, center, center);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($black-color, 0.5);
+  }
+
+  &-window {
+    @include flex(column);
+    border-radius: $default-border-radius;
+    background-color: $light-color;
+    min-width: $frame-max-width / 2;
+    min-height: $frame-max-width / 3;
+    max-width: $frame-max-width / 2;
+    max-height: $frame-max-width / 3;
+  }
+
+  &-body {
+    @include flex(column);
+    flex-grow: 1;
+    margin: $half-spacer;
+    border-bottom: 1px solid $default-border-color;
+  }
+
+  &-content {
+    @include flex(column, center, center);
+    flex-grow: 1;
+  }
+
+  &-footer {
+    @include flex(null, null, flex-end);
+    margin: 0 $half-spacer $half-spacer $half-spacer;
+
+    &__close-button {
+      margin-right: $half-spacer;
+    }
+  }
+}

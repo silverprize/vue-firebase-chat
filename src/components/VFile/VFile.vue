@@ -22,7 +22,7 @@ export default class VFile extends Vue {
   readonly fileElement!: HTMLInputElement
 
   onChange({ target }: Event) {
-    this.$emit('files', (target as HTMLInputElement).files)
+    this.$emit('files-selected', (target as HTMLInputElement).files)
     this.reset()
   }
 

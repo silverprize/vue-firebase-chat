@@ -1,0 +1,31 @@
+@import '../../scss/variables';
+@import '../../scss/mixins';
+
+.chat-room {
+  @include flex(column);
+  padding: 0 $spacer;
+  line-height: $base-line-height;
+
+  &__header {
+    @include flex(null, null, space-between);
+  }
+
+  &__title {
+    @include flex(null, center, null);
+    @include text-overflow();
+
+    &-text {
+      @include text-overflow();
+      margin: 0;
+    }
+    &-badge {
+      margin: 0 $spacer;
+      flex-shrink: 0;
+    }
+  }
+
+  &__leave-button {
+    margin: 0 $spacer;
+    flex-shrink: 0;
+  }
+}

@@ -1,5 +1,5 @@
 <template>
-  <div class="page main">
+  <VPage class="main">
     <img
       class="main__logo"
       src="../../assets/kakao.jpg"
@@ -17,18 +17,18 @@
     >
       <div class="main__form-group">
         <label
-          class="input-text-label"
+          class="main__input-label"
           for="chatId"
         >
           아이디
         </label>
         <input
           id="chatId"
+          ref="idElement"
           v-model="id"
-          class="input-text"
+          class="main__input"
           type="text"
           placeholder="홍길동"
-          autofocus
         >
       </div>
       <VButton
@@ -39,32 +39,55 @@
         접속
       </VButton>
     </form>
-  </div>
+  </VPage>
 </template>
 
 <script lang="ts">
+import { Component, Ref } from 'vue-property-decorator'
+import { Action } from 'vuex-class'
+import { mixins } from 'vue-class-component'
 import './PageMain.scss'
-import { Component, Vue } from 'vue-property-decorator'
-import RouteNames from '@/router/route-names'
+import { CONNECT } from '@/store/session/actions.type'
+import RouteName from '@/router/route.name'
 import VAlert from '@/components/VAlert/VAlert.vue'
 import VSpinner from '@/components/VSpinner/VSpinner.vue'
 import VButton from '@/components/VButton/VButton.vue'
+import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
+import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
+import VPage from '@/components/VPage/VPage.vue'
 
 @Component({
-  components: { VButton, VSpinner, VAlert },
+  components: { VPage, ChatFrame, VButton, VSpinner, VAlert },
 })
-export default class TheMain extends Vue {
+export default class PageMain extends mixins(GlobalSpinnerHandler) {
   id: string = ''
   message: string = ''
 
-  connect() {
+  @Ref()
+  readonly idElement!: HTMLElement
+
+  @Action(CONNECT)
+  readonly connectToServer!: (id: string) => Promise<void>
+
+  async connect() {
     if (!this.id.trim()) {
       this.message = '아이디를 입력하세요.'
       return
     }
-    this.$router.push({
-      name: RouteNames.ChatRoomList,
-    })
+    try {
+      this.startSpinner()
+      await this.connectToServer(this.id)
+      this.stopSpinner()
+      this.$router.push({
+        name: RouteName.ChatRoomList,
+      })
+    } catch (e) {
+      this.message = '접속이 안되고 있습니다.'
+    }
+  }
+
+  mounted() {
+    this.idElement.focus()
   }
 }
 </script>

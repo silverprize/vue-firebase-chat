@@ -1,0 +1,12 @@
+@import '../../scss/variables';
+@import '../../scss/mixins';
+
+.chat-frame {
+  &-header {
+    padding: $spacer 0;
+    margin: 0;
+    text-align: center;
+    background-color: #F9F9F9;
+    border-bottom: 1px solid $grey-border-color;
+  }
+}
