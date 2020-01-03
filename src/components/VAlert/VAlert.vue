@@ -1,18 +1,13 @@
-<template functional>
-  <div
-    class="alert"
-    :class="[data.staticClass, data.class]"
-  >
+<template>
+  <div class="alert">
     <slot />
   </div>
 </template>
 
 <script lang="ts">
-import './VAlert.scss'
 import { Component, Vue } from 'vue-property-decorator'
+import './VAlert.scss'
 
-@Component({
-  inheritAttrs: true,
-})
+@Component
 export default class VAlert extends Vue {}
 </script>

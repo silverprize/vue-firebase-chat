@@ -1,15 +1,12 @@
-<template functional>
-  <span
-    class="badge"
-    :class="[data.staticClass, data.class]"
-  >
+<template>
+  <span class="badge">
     <slot />
   </span>
 </template>
 
 <script lang="ts">
-import './VBadge.scss'
 import { Component, Vue } from 'vue-property-decorator'
+import './VBadge.scss'
 
 @Component
 export default class VBadge extends Vue {}
