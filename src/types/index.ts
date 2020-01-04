@@ -1,3 +1,7 @@
+export enum MessageType {
+  Chat,
+  System,
+}
 export enum MessageContentType {
   Text,
   Image,
@@ -8,6 +12,7 @@ export enum KeyCode {
 }
 
 export type Message = {
+  type: MessageType
   content: string
   contentType: MessageContentType
   senderId: string

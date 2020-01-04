@@ -8,6 +8,9 @@ import LocalizedFormat from 'dayjs/plugin/localizedFormat'
 import 'dayjs/locale/ko'
 
 Vue.config.productionTip = false
+Vue.filter('datetime', (value: string) => {
+  return dayjs(value).format('LL A hh:mm:ss')
+})
 
 dayjs.extend(LocalizedFormat)
 dayjs.locale('ko')

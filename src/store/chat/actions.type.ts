@@ -1,0 +1,5 @@
+export const FETCH_ROOM_LIST = 'chat.fetchRoomList'
+export const FETCH_ROOM_INFO = 'chat.fetchRoomInfo'
+export const DISPATCH_MESSAGE = 'chat.dispatchMessage'
+export const JOIN_ROOM = 'chat.joinRoom'
+export const LEAVE_ROOM = 'chat.leaveRoom'

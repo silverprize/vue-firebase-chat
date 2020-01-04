@@ -14,7 +14,7 @@
             v-slot="{ href, navigate }"
             :to="{
               name: RouteName.ChatRoom,
-              params: { name },
+              params: { room: name },
             }"
           >
             <a
@@ -55,6 +55,7 @@ import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
 import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader.vue'
 import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody.vue'
+import { FETCH_ROOM_LIST } from '@/store/chat/actions.type'
 
 @Component<PageChatRooms>({
   components: { ChatFrameBody, ChatFrameHeader, ChatFrame, VBadge, VButton },
@@ -64,6 +65,9 @@ export default class PageChatRooms extends mixins(GlobalSpinnerHandler) {
 
   @Getter(GET_ROOM_LIST)
   readonly roomList!: []
+
+  @Action(FETCH_ROOM_LIST)
+  readonly fetchRoomList!: () => Promise<void>
 
   @Action(DISCONNECT)
   readonly disconnectFromServer!: () => Promise<void>
@@ -75,6 +79,7 @@ export default class PageChatRooms extends mixins(GlobalSpinnerHandler) {
   async beforeRouteEnter(to: Route, from: Route, next: Function) {
     next(async (vm: PageChatRooms) => {
       vm.startSpinner()
+      await vm.fetchRoomList()
       vm.stopSpinner()
     })
   }

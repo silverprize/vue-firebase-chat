@@ -74,16 +74,16 @@ export default class PageMain extends mixins(GlobalSpinnerHandler) {
       this.message = '아이디를 입력하세요.'
       return
     }
+    this.startSpinner()
     try {
-      this.startSpinner()
       await this.connectToServer(this.id)
-      this.stopSpinner()
       this.$router.push({
         name: RouteName.ChatRoomList,
       })
     } catch (e) {
-      this.message = '접속이 안되고 있습니다.'
+      this.message = e.message
     }
+    this.stopSpinner()
   }
 
   mounted() {

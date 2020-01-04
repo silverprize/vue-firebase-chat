@@ -12,7 +12,7 @@
       <VButton
         class="chat-room__leave-button"
         variant="yellow"
-        @click="leaveRoom()"
+        @click="leave()"
       >
         나가기
       </VButton>
@@ -53,14 +53,14 @@
 
 <script lang="ts">
 import { Component, Ref } from 'vue-property-decorator'
-import { Getter } from 'vuex-class'
+import { Action, Getter } from 'vuex-class'
 import { Route } from 'vue-router'
 import { mixins } from 'vue-class-component'
 
 import './PageChatRoom.scss'
 import { GET_ID } from '@/store/session/getters.type'
-import { COUNT_PEOPLE, GET_MESSAGE_LIST, GET_ROOM_NAME } from '@/store/chat/getters.type'
-import { Message, MessageContentType } from '@/types'
+import { GET_COUNT_PEOPLE, GET_MESSAGE_LIST, GET_ROOM_NAME } from '@/store/chat/getters.type'
+import { Message, MessageContentType, MessageParams } from '@/types'
 import RouteName from '@/router/route.name'
 import VBadge from '@/components/VBadge/VBadge.vue'
 import VButton from '@/components/VButton/VButton.vue'
@@ -73,7 +73,8 @@ import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader.vue'
 import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody.vue'
 import ChatFrameInputPanel from '@/components/ChatFrameInputPanel/ChatFrameInputPanel.vue'
 import eventBus from '@/services/event-bus'
-import { OPEN_INVITATION_DIALOG, SEND_MESSAGE } from '@/services/event-bus/event-bus.event.name'
+import { OPEN_INVITATION_DIALOG } from '@/services/event-bus/event-bus.event.name'
+import { DISPATCH_MESSAGE, JOIN_ROOM, LEAVE_ROOM } from '@/store/chat/actions.type'
 
 @Component({
   components: {
@@ -104,13 +105,22 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
   @Getter(GET_ROOM_NAME)
   readonly chatRoomName!: string
 
-  @Getter(COUNT_PEOPLE)
+  @Getter(GET_COUNT_PEOPLE)
   readonly countUsers!: number
 
   @Getter(GET_MESSAGE_LIST)
   readonly messageList!: Message[]
 
-  leaveRoom() {
+  @Action(JOIN_ROOM)
+  readonly joinRoom!: (roomName: string) => Promise<void>
+
+  @Action(LEAVE_ROOM)
+  readonly leaveRoom!: () => Promise<void>
+
+  @Action(DISPATCH_MESSAGE)
+  readonly dispatchMessage!: (message: MessageParams) => Promise<void>
+
+  leave() {
     this.$router.replace({ name: RouteName.ChatRoomList })
   }
 
@@ -137,7 +147,7 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
     content: string | FileList
     contentType: MessageContentType
   }) {
-    eventBus.send(SEND_MESSAGE, {
+    this.dispatchMessage({
       content,
       contentType,
       senderId: this.me,
@@ -152,9 +162,19 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
   async beforeRouteEnter(to: Route, from: Route, next: Function) {
     next(async (vm: PageChatRoom) => {
       vm.startSpinner()
-      const roomName = to.params.id
+      const roomName = to.params.room
+      await vm.joinRoom(roomName)
       vm.stopSpinner()
     })
+  }
+
+  async beforeRouteLeave(to: Route, from: Route, next: () => void) {
+    if (to.name !== RouteName.ChatRoom) {
+      this.startSpinner()
+      await this.leaveRoom()
+      this.stopSpinner()
+    }
+    next()
   }
 }
 </script>

@@ -47,7 +47,7 @@ export default class PageChat extends Vue {
 
   readonly Dialog = Dialog
 
-  openInvitationDialog() {
+  openInvitationDialog(targeRoomName) {
     this.openDialog(Dialog.INVITATION)
   }
 
