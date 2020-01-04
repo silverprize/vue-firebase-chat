@@ -19,8 +19,9 @@ import { RES_JOINED } from "@/../server/protocol.js"import { RES_LEFT } from "@/
       v-if="dialogProps[Dialog.MESSAGE].visible"
       :message-list="dialogProps[Dialog.MESSAGE].messageList"
       :ok-label="dialogProps[Dialog.MESSAGE].okLabel"
+      :close-label="dialogProps[Dialog.MESSAGE].closeLabel"
       @ok="messageRead"
-      @close="closeDialog(Dialog.MESSAGE)"
+      @close="messageClosed"
     />
   </div>
 </template>
@@ -31,27 +32,36 @@ import { mixins } from 'vue-class-component'
 import { Action, Mutation } from 'vuex-class'
 
 import './PageChat.scss'
-import { OPEN_INVITATION_DIALOG } from '@/services/event-bus/event-bus.event.name'
+import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/eventBus.event.name'
 import { FETCH_ROOM_LIST } from '@/store/chat/actions.type'
-import { RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol.js'
+import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol.js'
 import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
 import DialogInvitation from '@/components/DialogInvitation/DialogInvitation.vue'
 import DialogConfirmInvitation from '@/components/DialogConfirmInvitation/DialogConfirmInvitation.vue'
 import VPage from '@/components/VPage/VPage.vue'
-import { InvitationRequest } from '@/types'
-import eventBus from '@/services/event-bus'
-import { disconnect, fetchAllPeople, invite, removeSocketEventListener, setSocketEventListener } from '@/services/chat'
+import eventBus from '@/services/eventBus'
+import { fetchAllPeople, invite, removeSocketEventListener, setSocketEventListener } from '@/services/chat'
 import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import RouteName from '@/router/route.name'
 import { CLEAR } from '@/store/session/mutations.type'
 import DialogMessage from '@/components/DialogMessage/DialogMessage.vue'
+
+type InvitationRequest = {
+  inviter: string
+  room: string
+}
+
+type MessageRequest = {
+  messageList: string[]
+  okLabel: string
+  closeLabel: string
+}
 
 enum Dialog {
   INVITATION,
   CONFIRM_INVITATION,
   MESSAGE,
 }
-const DISCONNECT = 'disconnect'
 
 @Component({
   components: { DialogMessage, VPage, DialogConfirmInvitation, DialogInvitation, ChatFrame },
@@ -73,6 +83,9 @@ export default class PageChat extends mixins(GlobalSpinnerHandler) {
       visible: false,
       messageList: [] as string[],
       okLabel: '',
+      closeLabel: '',
+      messageRequestList: [] as MessageRequest[],
+      disconnected: false,
     },
   }
 
@@ -100,33 +113,45 @@ export default class PageChat extends mixins(GlobalSpinnerHandler) {
   }
 
   async invitationAccepted() {
-    const { room } = this.dialogProps[Dialog.CONFIRM_INVITATION]
+    const { room, invitationRequestList } = this.dialogProps[Dialog.CONFIRM_INVITATION]
     this.$router.push({ name: RouteName.ChatRoom, params: { room } })
     this.closeDialog(Dialog.CONFIRM_INVITATION)
-    this.nextInvitation()
+    this.nextRequest(invitationRequestList, Dialog.CONFIRM_INVITATION)
   }
 
   invitationRejected() {
     this.closeDialog(Dialog.CONFIRM_INVITATION)
-    this.nextInvitation()
+    this.nextRequest(this.dialogProps[Dialog.CONFIRM_INVITATION].invitationRequestList, Dialog.CONFIRM_INVITATION)
   }
 
-  async nextInvitation() {
-    const { invitationRequestList } = this.dialogProps[Dialog.CONFIRM_INVITATION]
-    const next = invitationRequestList.pop()
+  async nextRequest(requestList: any[], dialog: Dialog) {
+    const next = requestList.pop()
     if (next) {
       setTimeout(() => {
-        this.openConfirmInvitationDialog({
-          chatId: next.inviter,
-          room: next.room,
-        })
+        if (dialog === Dialog.CONFIRM_INVITATION) {
+          this.openConfirmInvitationDialog({
+            chatId: next.inviter,
+            room: next.room,
+          })
+        } else if (dialog === Dialog.MESSAGE) {
+          this.openMessageDialog(next)
+        }
       }, 200)
     }
   }
 
   messageRead() {
-    this.clearSession()
-    this.$router.replace({ name: RouteName.Main })
+    const { messageRequestList, disconnected } = this.dialogProps[Dialog.MESSAGE]
+    if (disconnected) {
+      this.clearSession()
+      this.$router.replace({ name: RouteName.Main })
+    } else {
+      this.nextRequest(messageRequestList, Dialog.MESSAGE)
+    }
+  }
+
+  messageClosed() {
+    this.nextRequest(this.dialogProps[Dialog.MESSAGE].messageRequestList, Dialog.MESSAGE)
   }
 
   async openInvitationDialog(targetRoom: string) {
@@ -150,14 +175,31 @@ export default class PageChat extends mixins(GlobalSpinnerHandler) {
     }
   }
 
-  openDisconnectAlertDialog() {
+  openMessageDialog(args: { messageList: string[], okLabel: string, closeLabel: string, disconnected: boolean }) {
     const dialogProps = this.dialogProps[Dialog.MESSAGE]
-    dialogProps.messageList = [
-      '접속이 끊겼습니다.',
-      '접속페이지로 이동합니다.',
-    ]
-    dialogProps.okLabel = '이동'
-    this.openDialog(Dialog.MESSAGE)
+    if (dialogProps.visible) {
+      dialogProps.messageRequestList.push({
+        ...args,
+      })
+    } else {
+      dialogProps.messageList = args.messageList
+      dialogProps.okLabel = args.okLabel
+      dialogProps.closeLabel = args.closeLabel
+      dialogProps.disconnected = args.disconnected
+      this.openDialog(Dialog.MESSAGE)
+    }
+  }
+
+  openDisconnectAlertDialog() {
+    this.openMessageDialog({
+      messageList: [
+        '접속이 끊겼습니다.',
+        '접속페이지로 이동합니다.',
+      ],
+      okLabel: '이동',
+      closeLabel: '',
+      disconnected: true,
+    })
   }
 
   openDialog(dialog: Dialog) {
@@ -179,7 +221,7 @@ export default class PageChat extends mixins(GlobalSpinnerHandler) {
       case RES_INVITED:
         this.openConfirmInvitationDialog(data)
         break
-      case DISCONNECT:
+      case BUILTIN_DISCONNECT:
         this.openDisconnectAlertDialog()
         break
     }
@@ -187,7 +229,7 @@ export default class PageChat extends mixins(GlobalSpinnerHandler) {
 
   created() {
     setSocketEventListener([
-      DISCONNECT,
+      BUILTIN_DISCONNECT,
       RES_JOINED,
       RES_LEFT,
       RES_INVITED,

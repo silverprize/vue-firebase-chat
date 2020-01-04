@@ -14,12 +14,14 @@
       <select
         id="user"
         v-model="guest"
+        :value="guest"
         class="dialog-select-user"
       >
         <template v-if="people.length">
           <option
             v-for="chatId in people"
             :key="chatId"
+            :value="chatId"
           >
             {{ chatId }}
           </option>

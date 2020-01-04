@@ -6,7 +6,7 @@ import { RES_NEW_MESSAGE } from "@/../server/protocol.js"
     <ChatFrameHeader class="chat-room__header">
       <div class="chat-room__title">
         <VBadge class="chat-room__title-badge">
-          👨‍👩‍👧‍👦{{ countUsers }}
+          👨‍👩‍👧‍👦 {{ countUsers }}
         </VBadge>
         <h4 class="chat-room__title-text">
           {{ roomName }}
@@ -75,8 +75,8 @@ import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
 import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader.vue'
 import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody.vue'
 import ChatFrameInputPanel from '@/components/ChatFrameInputPanel/ChatFrameInputPanel.vue'
-import eventBus from '@/services/event-bus'
-import { OPEN_INVITATION_DIALOG } from '@/services/event-bus/event-bus.event.name'
+import eventBus from '@/services/eventBus'
+import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/eventBus.event.name'
 import { DISPATCH_MESSAGE, FETCH_ROOM_INFO, JOIN_ROOM, LEAVE_ROOM } from '@/store/chat/actions.type'
 import { ADD_MESSAGE, SET_IMAGE_URL } from '@/store/chat/mutations.type'
 import { RES_IMAGE_UPLOADED, RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol.js'
@@ -185,7 +185,9 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
   async leaveRoom() {
     this.startSpinner()
     removeSocketEventListener(this.socketEventReceived)
-    await this.dispatchLeave()
+    try {
+      await this.dispatchLeave()
+    } catch (e) {}
     this.stopSpinner()
   }
 
@@ -237,7 +239,9 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
 
   async beforeRouteLeave(to: Route, from: Route, next: () => void) {
     if (to.name !== RouteName.ChatRoom) {
-      await this.leaveRoom()
+      try {
+        await this.leaveRoom()
+      } catch (e) {}
     }
     next()
   }

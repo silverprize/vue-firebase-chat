@@ -32,6 +32,12 @@
   &-content {
     @include flex(column, center, center);
     flex-grow: 1;
+
+    &-message {
+      &:not(last-child) {
+        margin-bottom: $half-spacer / 2;
+      }
+    }
   }
 
   &-footer {

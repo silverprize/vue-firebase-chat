@@ -36,14 +36,14 @@ status.chatRooms = chatRoomNames.concat(Lobby).reduce((map, name) => {
 }, {})
 
 function connected(socket) {
-  console.info('connected', socket.id)
-  socket.on('disconnect', () => {
-    console.info('disconnected', socket.id, socket.chatId, socket.currentChatRoom)
+  console.info('connected: ', socket.id)
+  socket.on(protocol.BUILTIN_DISCONNECT, () => {
     if (socket.currentChatRoom) {
       leaveSocketRoom(socket, socket.currentChatRoom)
     }
     delete status.people[socket.chatId]
     status.countTotalPeople--
+    console.info('disconnected: ', socket.id, socket.chatId, socket.currentChatRoom, status.countTotalPeople, status.chatRooms)
   })
 }
 
@@ -183,7 +183,7 @@ function attachFileHandler(socket) {
 
 module.exports = (server) => {
   const chat = new SocketIO(server, {
-    pingTimeout: 5000000,
+    pingTimeout: 60000,
   })
   chat.on('connection', (socket) => {
     connected(socket)

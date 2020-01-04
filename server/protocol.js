@@ -13,4 +13,5 @@ module.exports = {
   RES_LEFT: 'RES_LEFT',
   RES_INVITED: 'RES_INVITED',
   RES_IMAGE_UPLOADED: 'RES_IMAGE_UPLOADED',
+  BUILTIN_DISCONNECT: 'disconnect',
 }

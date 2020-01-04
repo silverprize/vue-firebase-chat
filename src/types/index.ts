@@ -30,8 +30,3 @@ export type Room = {
   name: string
   countPeople: number
 }
-
-export type InvitationRequest = {
-  inviter: string
-  room: string
-}

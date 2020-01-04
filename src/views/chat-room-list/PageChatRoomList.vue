@@ -25,7 +25,7 @@
               @click="navigate"
             >
               {{ name }}
-              <VBadge>👨‍👩‍👧‍👦{{ countPeople }}</VBadge>
+              <VBadge>👨‍👩‍👧‍👦 {{ countPeople }}</VBadge>
             </a>
           </router-link>
         </li>
@@ -89,7 +89,9 @@ export default class PageChatRooms extends mixins(GlobalSpinnerHandler) {
   async beforeRouteLeave(to: Route, from: Route, next: Function) {
     if (to.name !== RouteName.ChatRoom) {
       this.startSpinner()
-      await this.disconnectFromServer()
+      try {
+        await this.disconnectFromServer()
+      } catch (e) {}
       this.stopSpinner()
     }
     next()

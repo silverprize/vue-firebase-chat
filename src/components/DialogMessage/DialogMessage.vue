@@ -1,12 +1,14 @@
 <template>
   <VDialog
     :ok-label="okLabel"
+    :close-label="closeLabel"
     v-on="$listeners"
   >
     <div class="dialog-content">
       <div
         v-for="(message, index) in messageList"
         :key="index"
+        class="dialog-content-message"
       >
         {{ message }}
       </div>
@@ -27,5 +29,8 @@ export default class DialogMessage extends Vue {
 
   @Prop(String)
   readonly okLabel!: string
+
+  @Prop(String)
+  readonly closeLabel!: string
 }
 </script>

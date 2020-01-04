@@ -4,10 +4,10 @@
     v-on="$listeners"
   >
     <div class="dialog-content">
-      <div>
+      <div class="dialog-content-message">
         <strong>{{ inviter }}</strong> 님이,
       </div>
-      <div>
+      <div class="dialog-content-message">
         <strong>{{ room }}</strong> 방으로 초대했습니다.
       </div>
     </div>

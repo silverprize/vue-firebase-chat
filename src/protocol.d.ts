@@ -13,4 +13,5 @@ declare module '@/../server/protocol.js' {
   export const RES_LEFT: string
   export const RES_INVITED: string
   export const RES_IMAGE_UPLOADED: string
+  export const BUILTIN_DISCONNECT: string
 }

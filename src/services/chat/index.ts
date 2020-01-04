@@ -2,14 +2,21 @@ import SocketIO from 'socket.io-client'
 import SocketIOFileClient from 'socket.io-file-client'
 import { MessageContentType, MessageParams, Room } from '@/types'
 import {
+  BUILTIN_DISCONNECT,
   REQ_INVITE,
   REQ_JOIN,
   REQ_LEAVE,
   REQ_MESSAGE,
+  REQ_PEOPLE_IN_ROOM,
   REQ_PEOPLE_OTHER_ROOMS,
   REQ_REGISTER_ID,
   REQ_ROOM_INFO,
   REQ_ROOM_LIST,
+  RES_IMAGE_UPLOADED,
+  RES_INVITED,
+  RES_JOINED,
+  RES_LEFT,
+  RES_NEW_MESSAGE,
 } from '@/../server/protocol.js'
 
 type ListenerInfo = {
@@ -19,9 +26,38 @@ type ListenerInfo = {
 }
 const socket = SocketIO({
   autoConnect: false,
+  reconnection: false,
+  forceNew: true,
 })
 const uploader = new SocketIOFileClient(socket)
 let socketEventListeners: ListenerInfo[] = []
+
+const chatEventList = [
+  REQ_REGISTER_ID,
+  REQ_ROOM_LIST,
+  REQ_ROOM_INFO,
+  REQ_PEOPLE_IN_ROOM,
+  REQ_MESSAGE,
+  REQ_INVITE,
+  REQ_JOIN,
+  REQ_LEAVE,
+  REQ_PEOPLE_OTHER_ROOMS,
+  RES_NEW_MESSAGE,
+  RES_JOINED,
+  RES_LEFT,
+  RES_INVITED,
+  RES_IMAGE_UPLOADED,
+]
+const connectionErrorEventList = [
+  'connect_error',
+  BUILTIN_DISCONNECT,
+]
+connectionErrorEventList.forEach(eventName => {
+  socket.on(eventName, function (event: string) {
+    chatEventList.forEach(chatEvent => socket.off(chatEvent))
+    socket.disconnect()
+  }.bind(null, eventName))
+})
 
 function setSocketEventListener(eventList: string[], listener: (event: string, args: any) => void) {
   eventList.forEach(event => {
@@ -47,28 +83,32 @@ function removeSocketEventListener(listener: Function) {
 function connect(id: string) {
   return new Promise((resolve, reject) => {
     socket.connect()
-    socket.once(REQ_REGISTER_ID, async (err?: string) => {
-      if (err) {
-        reject(new Error(err))
-      } else {
-        resolve()
-      }
+    socket.once('connect', () => {
+      socket.once(REQ_REGISTER_ID, async (err?: string) => {
+        if (err) {
+          reject(new Error(err))
+          socket.disconnect()
+        } else {
+          resolve()
+        }
+      })
+      socket.emit(REQ_REGISTER_ID, id)
     })
-    socket.emit(REQ_REGISTER_ID, id)
+    socket.once('connect_error', () => {
+      reject(new Error('서버에 연결할 수 없습니다.'))
+    })
   })
 }
 
 function disconnect() {
   return new Promise((resolve) => {
-    socket.once('disconnect', resolve)
     socket.disconnect()
   })
 }
 
 function fetchRoomList(): Promise<Room[]> {
-  return new Promise((resolve) => {
-    socket.once(REQ_ROOM_LIST, resolve)
-    socket.emit(REQ_ROOM_LIST)
+  return new Promise((resolve, reject) => {
+    runAfterTestConnection(REQ_ROOM_LIST, resolve, reject)
   })
 }
 
@@ -110,17 +150,24 @@ function invite(params: { chatId: string, room: string }) {
 }
 
 function join(room: string) {
-  return new Promise((resolve) => {
-    socket.once(REQ_JOIN, resolve)
-    socket.emit(REQ_JOIN, room)
+  return new Promise((resolve, reject) => {
+    runAfterTestConnection(REQ_JOIN, resolve, reject, room)
   })
 }
 
 function leave() {
-  return new Promise((resolve) => {
-    socket.once(REQ_LEAVE, resolve)
-    socket.emit(REQ_LEAVE)
+  return new Promise((resolve, reject) => {
+    runAfterTestConnection(REQ_LEAVE, resolve, reject)
   })
+}
+
+function runAfterTestConnection(event: string, resolve: () => void, reject: (reason?: any) => void, ...args: any[]) {
+  if (socket.disconnected) {
+    reject(new Error('Disconnected'))
+  } else {
+    socket.once(event, resolve)
+    socket.emit(event, ...args)
+  }
 }
 
 export {

@@ -6,11 +6,12 @@
       </div>
       <div class="dialog-footer">
         <VButton
+          v-if="closeLabel"
           variant="light"
           class="dialog-footer__close-button"
           @click="$emit('close')"
         >
-          닫기
+          {{ closeLabel }}
         </VButton>
         <VButton
           variant="yellow"
@@ -34,5 +35,8 @@ import VButton from '@/components/VButton/VButton.vue'
 export default class VDialog extends Vue {
   @Prop({ type: String, default: '확인' })
   readonly okLabel!: string
+
+  @Prop({ type: String, default: '닫기' })
+  readonly closeLabel!: string
 }
 </script>
