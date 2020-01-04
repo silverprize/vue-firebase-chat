@@ -1,8 +1,10 @@
+const path = require('path')
 const SocketIO = require('socket.io')
 const SocketIOFile = require('socket.io-file')
 const uuid = require('uuid')
 const protocol = require('./protocol')
 
+const imageBaseUrl = process.env.VUE_APP_IMAGE_BASE_URL
 const Lobby = 'Lobby'
 const Moon = 'Moon'
 const Mercury = 'Mercury'
@@ -45,12 +47,13 @@ function connected(socket) {
   })
 }
 
-function registerId(socket, id) {
+async function registerId(socket, id) {
   const exists = !!status.people[id]
   if (!exists) {
     socket.chatId = id
     status.people[id] = socket
     status.countTotalPeople++
+    await joinRoom(socket, null, Lobby)
   }
   socket.emit(protocol.REQ_REGISTER_ID, exists ? '접속중인 아이디입니다.' : null)
 }
@@ -103,7 +106,10 @@ function leaveRoom(socket, room) {
 
 function broadcastMessageToRoom(socket, message) {
   socket.emit(protocol.REQ_MESSAGE)
-  socket.nsp.to(socket.currentRoom).emit(protocol.RES_NEW_MESSAGE, message)
+  broadcast(socket).emit(protocol.RES_NEW_MESSAGE, {
+    ...message,
+    sentAt: new Date().toISOString(),
+  })
 }
 
 function sendInvitation(socket, { chatId, room }) {
@@ -112,27 +118,40 @@ function sendInvitation(socket, { chatId, room }) {
   })
 }
 
+function broadcast(socket) {
+  return socket.nsp.to(socket.currentRoom)
+}
+
 function attachFileHandler(socket) {
+  const chunkSize = 10240
   const uploader = new SocketIOFile(socket, {
-    uploadDir: 'data',
+    uploadDir: path.join(__dirname, imageBaseUrl),
+    chunkSize,
     rename: (fileName) => {
       const extName = path.extname(fileName)
       return `${uuid.v1()}${extName}`
     },
   })
+  uploader.on('stream', (fileInfo) => {
+    if (fileInfo.wrote <= chunkSize) {
+      broadcastMessageToRoom(socket, {
+        ...fileInfo.data,
+        uploadId: fileInfo.uploadId,
+      })
+    }
+  })
   uploader.on('complete', (fileInfo) => {
-    socket.emit('msg', fileInfo)
+    broadcast(socket).emit(protocol.RES_IMAGE_UPLOADED, {
+      ...fileInfo,
+      url: `${imageBaseUrl}/${fileInfo.name}`,
+    })
   })
   uploader.on('error', (err) => {
-    socket.emit('msg', err)
+    socket.emit(protocol.RES_IMAGE_UPLOADED, err)
   })
   uploader.on('abort', (err) => {
-    socket.emit('msg', err)
+    socket.emit(protocol.RES_IMAGE_UPLOADED, err)
   })
-  uploader.on('start', (err) => {
-    socket.emit('msg', err)
-  })
-  socket.emit('msg', 'msg')
 }
 
 module.exports = (server) => {

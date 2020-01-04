@@ -1,18 +1,18 @@
 const path = require('path')
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
+require('dotenv').config({ path: path.join(__dirname, '../.env') })
 
+const imageBaseUrl = process.env.VUE_APP_IMAGE_BASE_URL
 const fs = require('fs').promises
 const http = require('http')
 const Koa = require('koa')
 const send = require('koa-send')
-const SocketIO = require('socket.io')
-const docRoot = path.resolve(__dirname, '../dist')
-const nodeModulesRoot = path.resolve(__dirname, 'node_modules')
-const uploadRoot = path.resolve(__dirname, 'data')
+const docRoot = path.join(__dirname, '../dist')
+const nodeModulesRoot = path.join(__dirname, 'node_modules')
+const uploadRoot = path.join(__dirname, imageBaseUrl)
 const roots = [nodeModulesRoot, uploadRoot, docRoot]
 
 async function serve(ctx, next) {
-  const filePath = ctx.path.replace('/', '')
+  const filePath = ctx.path.replace('/images', '').replace('/', '')
   let done = false
   let i = 0
   do {
@@ -28,7 +28,7 @@ async function serve(ctx, next) {
 
 async function sendFile(ctx, root, filePath) {
   try {
-    const stats = await fs.stat(path.resolve(root, filePath))
+    const stats = await fs.stat(path.join(root, filePath))
     if (stats.isFile()) {
       await send(ctx, filePath, { root })
       return true

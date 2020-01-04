@@ -1,5 +1,5 @@
 export enum MessageType {
-  Chat,
+  User,
   System,
 }
 export enum MessageContentType {
@@ -17,6 +17,7 @@ export type Message = {
   contentType: MessageContentType
   senderId: string
   sentAt: string
+  uploadId?: string
 }
 
 export type MessageParams = {

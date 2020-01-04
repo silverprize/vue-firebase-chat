@@ -98,6 +98,11 @@
       &-image {
         max-width: $frame-max-width / 3;
         max-height: $frame-max-width / 3;
+
+        &-wrapper {
+          @include flex(column, center, center);
+          min-height: 100px;
+        }
       }
     }
 

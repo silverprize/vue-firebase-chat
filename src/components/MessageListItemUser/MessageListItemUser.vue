@@ -34,14 +34,23 @@
           <template v-if="isText">
             {{ message.content }}
           </template>
-          <img
+          <div
             v-else-if="isImage"
-            class="message-list-item-user-balloon__content-image"
-            :src="message.content"
-            alt="image message"
-            @load.once="contentLoaded"
-            @error.once="contentLoaded"
+            class="message-list-item-user-balloon__content-image-wrapper"
           >
+            <img
+              class="message-list-item-user-balloon__content-image"
+              :src="message.content"
+              alt=""
+              @load.once="contentLoaded"
+              @error.once="contentLoaded"
+            >
+            <div
+              v-if="!isContentLoaded"
+              class="absolute spinner"
+              :class="{ 'spinner_color_light': isMyMessage }"
+            />
+          </div>
           <span
             class="message-list-item-user-balloon__datetime"
             :class="{ 'message-list-item-user-balloon__datetime_align_right': isMyMessage }"
@@ -59,6 +68,8 @@ import { Message, MessageContentType } from '@/types'
 
 @Component
 export default class MessageListItemUser extends Vue {
+  isContentLoaded = false
+
   get senderInitial() {
     return this.message.senderId[0]
   }
@@ -78,6 +89,7 @@ export default class MessageListItemUser extends Vue {
   readonly isMyMessage!: boolean
 
   contentLoaded() {
+    this.isContentLoaded = true
     this.$emit('message-loaded')
   }
 

@@ -1,12 +1,19 @@
 import { Module } from 'vuex'
-import { ADD_MESSAGE, CLEAR, SET_PEOPLE_IN_ROOM, SET_ROOM, SET_ROOM_LIST } from './mutations.type'
+import {
+  ADD_MESSAGE,
+  CLEAR,
+  SET_IMAGE_URL,
+  SET_PEOPLE_IN_ROOM,
+  SET_ROOM,
+  SET_ROOM_LIST,
+} from './mutations.type'
 import {
   GET_COUNT_PEOPLE,
   GET_MESSAGE_LIST,
   GET_ROOM_LIST,
   GET_ROOM_NAME,
 } from '@/store/chat/getters.type'
-import { Message, MessageContentType, MessageParams, MessageType, Room } from '@/types'
+import { Message, MessageContentType, Room } from '@/types'
 import {
   DISPATCH_MESSAGE,
   FETCH_ROOM_INFO,
@@ -20,15 +27,18 @@ import {
   fetchRoomList,
   join,
   leave,
-  listenRoomEvent, stopListenRoomEvent,
+  listenRoomEvent,
+  stopListenRoomEvent,
 } from '@/services/chat'
-import { RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol.js'
+import roomEventHandler from '@/store/chat/roomEventHandler'
+import { FileInfo } from 'socket.io-file-client'
 
 interface State {
   roomList: []
   people: []
   messageList: Message[]
   room: Room
+  imageMessageMap: { [key: string]: Message }
 }
 
 const blankRoom = { name: '', countPeople: 0 }
@@ -38,6 +48,7 @@ const chat: Module<State, any> = {
     people: [],
     messageList: [],
     room: blankRoom,
+    imageMessageMap: {},
   },
   getters: {
     [GET_ROOM_LIST]: state => state.roomList,
@@ -55,14 +66,16 @@ const chat: Module<State, any> = {
     [SET_ROOM]: (state, room: Room) => {
       state.room = room
     },
-    [ADD_MESSAGE]: (state, message: MessageParams) => {
-      const msg = Object.assign({
-        sentAt: new Date().toISOString(),
-      }, message) as Message
+    [ADD_MESSAGE]: (state, message: Message) => {
       if (message.contentType === MessageContentType.Image) {
-        msg.content = '/kakao.jpg'
+        state.imageMessageMap[message.uploadId as string] = message
       }
-      state.messageList.push(msg)
+      state.messageList.push(message)
+    },
+    [SET_IMAGE_URL]: (state, data: FileInfo & { url: string }) => {
+      if (state.imageMessageMap[data.uploadId]) {
+        state.imageMessageMap[data.uploadId].content = data.url
+      }
     },
     [CLEAR]: (state) => {
       state.messageList = []
@@ -84,27 +97,7 @@ const chat: Module<State, any> = {
       await dispatchMessage(message)
     },
     [JOIN_ROOM]: async ({ commit, dispatch }, roomName) => {
-      listenRoomEvent(async (event: string, data: any) => {
-        switch (event) {
-          case RES_NEW_MESSAGE:
-            commit(ADD_MESSAGE, data)
-            break
-          case RES_JOINED:
-            commit(ADD_MESSAGE, {
-              type: MessageType.System,
-              content: `${data.chatId}님이 입장했습니다.`,
-            })
-            await dispatch(FETCH_ROOM_INFO, roomName)
-            break
-          case RES_LEFT:
-            commit(ADD_MESSAGE, {
-              type: MessageType.System,
-              content: `${data.chatId}님이 떠났습니다.`,
-            })
-            await dispatch(FETCH_ROOM_INFO, roomName)
-            break
-        }
-      })
+      listenRoomEvent(roomEventHandler.bind(null, { commit, dispatch }))
       await join(roomName)
       await dispatch(FETCH_ROOM_INFO, roomName)
     },
