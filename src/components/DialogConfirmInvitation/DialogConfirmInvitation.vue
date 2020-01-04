@@ -16,7 +16,6 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import './DialogConfirmInvitation.scss'
 import VDialog from '@/components/VDialog/VDialog.vue'
 
 @Component({

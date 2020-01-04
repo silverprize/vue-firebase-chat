@@ -21,16 +21,7 @@ import {
   JOIN_ROOM,
   LEAVE_ROOM,
 } from '@/store/chat/actions.type'
-import {
-  dispatchMessage,
-  fetchRoomInfo,
-  fetchRoomList,
-  join,
-  leave,
-  listenRoomEvent,
-  stopListenRoomEvent,
-} from '@/services/chat'
-import roomEventHandler from '@/store/chat/roomEventHandler'
+import { dispatchMessage, fetchRoomInfo, fetchRoomList, join, leave } from '@/services/chat'
 import { FileInfo } from 'socket.io-file-client'
 
 interface State {
@@ -89,20 +80,18 @@ const chat: Module<State, any> = {
       const roomList = await fetchRoomList()
       commit(SET_ROOM_LIST, roomList)
     },
-    [FETCH_ROOM_INFO]: async ({ commit }, roomName) => {
-      const roomInfo = await fetchRoomInfo(roomName)
+    [FETCH_ROOM_INFO]: async ({ commit }, room) => {
+      const roomInfo = await fetchRoomInfo(room)
       commit(SET_ROOM, roomInfo)
     },
     [DISPATCH_MESSAGE]: async ({ commit }, message) => {
       await dispatchMessage(message)
     },
-    [JOIN_ROOM]: async ({ commit, dispatch }, roomName) => {
-      listenRoomEvent(roomEventHandler.bind(null, { commit, dispatch }))
-      await join(roomName)
-      await dispatch(FETCH_ROOM_INFO, roomName)
+    [JOIN_ROOM]: async ({ dispatch }, room) => {
+      await join(room)
+      await dispatch(FETCH_ROOM_INFO, room)
     },
     [LEAVE_ROOM]: async ({ commit }) => {
-      stopListenRoomEvent()
       await leave()
       commit(CLEAR)
     },

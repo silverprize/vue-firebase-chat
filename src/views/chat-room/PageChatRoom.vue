@@ -1,3 +1,6 @@
+import { RES_LEFT } from "@/../server/protocol.js"import { RES_IMAGE_UPLOADED } from "@/../server/protocol.js"
+import { RES_JOINED } from "@/../server/protocol.js"
+import { RES_NEW_MESSAGE } from "@/../server/protocol.js"
 <template>
   <ChatFrame>
     <ChatFrameHeader class="chat-room__header">
@@ -6,7 +9,7 @@
           👨‍👩‍👧‍👦{{ countUsers }}
         </VBadge>
         <h4 class="chat-room__title-text">
-          {{ chatRoomName }}
+          {{ roomName }}
         </h4>
       </div>
       <VButton
@@ -53,14 +56,14 @@
 
 <script lang="ts">
 import { Component, Ref } from 'vue-property-decorator'
-import { Action, Getter } from 'vuex-class'
+import { Action, Getter, Mutation } from 'vuex-class'
 import { Route } from 'vue-router'
 import { mixins } from 'vue-class-component'
 
 import './PageChatRoom.scss'
 import { GET_ID } from '@/store/session/getters.type'
 import { GET_COUNT_PEOPLE, GET_MESSAGE_LIST, GET_ROOM_NAME } from '@/store/chat/getters.type'
-import { Message, MessageContentType, MessageParams } from '@/types'
+import { Message, MessageContentType, MessageParams, MessageType } from '@/types'
 import RouteName from '@/router/route.name'
 import VBadge from '@/components/VBadge/VBadge.vue'
 import VButton from '@/components/VButton/VButton.vue'
@@ -74,7 +77,10 @@ import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody.vue'
 import ChatFrameInputPanel from '@/components/ChatFrameInputPanel/ChatFrameInputPanel.vue'
 import eventBus from '@/services/event-bus'
 import { OPEN_INVITATION_DIALOG } from '@/services/event-bus/event-bus.event.name'
-import { DISPATCH_MESSAGE, JOIN_ROOM, LEAVE_ROOM } from '@/store/chat/actions.type'
+import { DISPATCH_MESSAGE, FETCH_ROOM_INFO, JOIN_ROOM, LEAVE_ROOM } from '@/store/chat/actions.type'
+import { ADD_MESSAGE, SET_IMAGE_URL } from '@/store/chat/mutations.type'
+import { RES_IMAGE_UPLOADED, RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol.js'
+import { removeSocketEventListener, setSocketEventListener } from '@/services/chat'
 
 @Component({
   components: {
@@ -103,7 +109,7 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
   readonly me!: string
 
   @Getter(GET_ROOM_NAME)
-  readonly chatRoomName!: string
+  readonly roomName!: string
 
   @Getter(GET_COUNT_PEOPLE)
   readonly countUsers!: number
@@ -111,21 +117,30 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
   @Getter(GET_MESSAGE_LIST)
   readonly messageList!: Message[]
 
+  @Mutation(ADD_MESSAGE)
+  readonly addNewMessage!: (message: Message) => void
+
+  @Mutation(SET_IMAGE_URL)
+  readonly updateMessageImage!: (message: Message) => void
+
   @Action(JOIN_ROOM)
-  readonly joinRoom!: (roomName: string) => Promise<void>
+  readonly dispatchJoin!: (roomName: string) => Promise<void>
 
   @Action(LEAVE_ROOM)
-  readonly leaveRoom!: () => Promise<void>
+  readonly dispatchLeave!: () => Promise<void>
 
   @Action(DISPATCH_MESSAGE)
   readonly dispatchMessage!: (message: MessageParams) => Promise<void>
+
+  @Action(FETCH_ROOM_INFO)
+  readonly updateRoomInfo!: (room: string) => Promise<void>
 
   leave() {
     this.$router.replace({ name: RouteName.ChatRoomList })
   }
 
   openInviteDialog() {
-    eventBus.send(OPEN_INVITATION_DIALOG)
+    eventBus.send(OPEN_INVITATION_DIALOG, this.roomName)
   }
 
   newMessageLoaded() {
@@ -154,25 +169,75 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
     })
   }
 
+  async joinRoom(room: string) {
+    this.startSpinner()
+    removeSocketEventListener(this.socketEventReceived)
+    setSocketEventListener([
+      RES_NEW_MESSAGE,
+      RES_JOINED,
+      RES_LEFT,
+      RES_IMAGE_UPLOADED,
+    ], this.socketEventReceived)
+    await this.dispatchJoin(room)
+    this.stopSpinner()
+  }
+
+  async leaveRoom() {
+    this.startSpinner()
+    removeSocketEventListener(this.socketEventReceived)
+    await this.dispatchLeave()
+    this.stopSpinner()
+  }
+
+  async socketEventReceived(event: string, data: any) {
+    switch (event) {
+      case RES_NEW_MESSAGE:
+        this.addNewMessage({
+          ...data,
+          type: MessageType.User,
+        })
+        break
+      case RES_JOINED:
+        this.addNewMessage({
+          ...data,
+          type: MessageType.System,
+          content: `${data.chatId}님이 입장했습니다.`,
+        })
+        await this.updateRoomInfo(data.room)
+        break
+      case RES_LEFT:
+        this.addNewMessage({
+          ...data,
+          type: MessageType.System,
+          content: `${data.chatId}님이 떠났습니다.`,
+        })
+        await this.updateRoomInfo(data.room)
+        break
+      case RES_IMAGE_UPLOADED:
+        this.updateMessageImage(data)
+        break
+    }
+  }
+
   mounted() {
     // @ts-ignore
     this.inputPanel.focusInput()
   }
 
   async beforeRouteEnter(to: Route, from: Route, next: Function) {
-    next(async (vm: PageChatRoom) => {
-      vm.startSpinner()
-      const roomName = to.params.room
-      await vm.joinRoom(roomName)
-      vm.stopSpinner()
+    next((vm: PageChatRoom) => {
+      vm.joinRoom(to.params.room)
     })
+  }
+
+  async beforeRouteUpdate(to: Route, from: Route, next: Function) {
+    await this.joinRoom(to.params.room)
+    next()
   }
 
   async beforeRouteLeave(to: Route, from: Route, next: () => void) {
     if (to.name !== RouteName.ChatRoom) {
-      this.startSpinner()
       await this.leaveRoom()
-      this.stopSpinner()
     }
     next()
   }

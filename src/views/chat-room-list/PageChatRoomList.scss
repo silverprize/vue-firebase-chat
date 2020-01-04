@@ -2,6 +2,10 @@
 @import '../../scss/mixins';
 
 .chat-rooms {
+  &-header {
+    margin: 0;
+  }
+
   &-list {
     list-style: none;
     margin: 0;

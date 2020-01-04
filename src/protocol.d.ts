@@ -8,6 +8,7 @@ declare module '@/../server/protocol.js' {
   export const REQ_INVITE: string
   export const REQ_JOIN: string
   export const REQ_LEAVE: string
+  export const REQ_PEOPLE_OTHER_ROOMS: string
   export const RES_JOINED: string
   export const RES_LEFT: string
   export const RES_INVITED: string

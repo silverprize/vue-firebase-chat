@@ -13,7 +13,7 @@ const Earth = 'Earth'
 const Pluto = 'Pluto'
 const Uranus = 'Uranus'
 
-const roomNames = [
+const chatRoomNames = [
   Moon,
   Mercury,
   Mars,
@@ -24,12 +24,12 @@ const roomNames = [
 
 const status = {
   people: {},
-  rooms: {},
+  chatRooms: {},
   countTotalPeople: 0,
 }
-status.rooms = roomNames.concat(Lobby).reduce((map, roomName) => {
-  map[roomName] = {
-    name: roomName,
+status.chatRooms = chatRoomNames.concat(Lobby).reduce((map, name) => {
+  map[name] = {
+    name,
     countPeople: 0,
   }
   return map
@@ -38,9 +38,9 @@ status.rooms = roomNames.concat(Lobby).reduce((map, roomName) => {
 function connected(socket) {
   console.info('connected', socket.id)
   socket.on('disconnect', () => {
-    console.info('disconnected', socket.id, socket.chatId, socket.currentRoom)
-    if (socket.currentRoom) {
-      leaveRoom(socket, socket.currentRoom)
+    console.info('disconnected', socket.id, socket.chatId, socket.currentChatRoom)
+    if (socket.currentChatRoom) {
+      leaveSocketRoom(socket, socket.currentChatRoom)
     }
     delete status.people[socket.chatId]
     status.countTotalPeople--
@@ -53,55 +53,49 @@ async function registerId(socket, id) {
     socket.chatId = id
     status.people[id] = socket
     status.countTotalPeople++
-    await joinRoom(socket, null, Lobby)
+    await joinChatRoom(socket, Lobby)
   }
   socket.emit(protocol.REQ_REGISTER_ID, exists ? '접속중인 아이디입니다.' : null)
 }
 
 function sendRoomList(socket) {
-  socket.emit(protocol.REQ_ROOM_LIST, roomNames.map(roomName => ({
-    name: roomName,
-    countPeople: status.rooms[roomName].countPeople,
+  socket.emit(protocol.REQ_ROOM_LIST, chatRoomNames.map(name => ({
+    name,
+    countPeople: status.chatRooms[name].countPeople,
   })))
 }
 
-function sendRoomInfo(socket, roomName) {
-  socket.emit(protocol.REQ_ROOM_INFO, status.rooms[roomName])
+function sendRoomInfo(socket, chatRoom) {
+  socket.emit(protocol.REQ_ROOM_INFO, status.chatRooms[chatRoom])
 }
 
-function joinRoom(socket, fromRoom, toRoom) {
-  return new Promise(async (resolve) => {
-    if (fromRoom && fromRoom !== toRoom) {
-      await leaveRoom(socket, fromRoom)
-    }
-    socket.join(toRoom, async () => {
-      socket.currentRoom = toRoom
-      status.rooms[toRoom].countPeople++
-      socket.nsp.to(toRoom).emit(protocol.RES_JOINED, {
-        room: toRoom,
-        chatId: socket.chatId,
-      })
-      socket.emit(protocol.REQ_JOIN)
-      resolve()
-    })
+async function joinChatRoom(socket, chatRoom) {
+  const { currentChatRoom } = socket
+  if (currentChatRoom && currentChatRoom !== chatRoom) {
+    await leaveSocketRoom(socket, currentChatRoom)
+  }
+  await joinSocketRoom(socket, chatRoom)
+  socket.currentChatRoom = chatRoom
+  socket.nsp.to(chatRoom).emit(protocol.RES_JOINED, {
+    room: chatRoom,
+    chatId: socket.chatId,
   })
+  socket.emit(protocol.REQ_JOIN)
 }
 
-function leaveRoom(socket, room) {
-  return new Promise(async (resolve) => {
-    socket.leave(room, async () => {
-      status.rooms[room].countPeople--
-      socket.nsp.to(room).emit(protocol.RES_LEFT, {
-        room,
-        chatId: socket.chatId,
-      })
-      if (room && room !== Lobby) {
-        await joinRoom(socket, null, Lobby)
-      }
-      socket.emit(protocol.REQ_LEAVE)
-      resolve()
-    })
+async function leaveChatRoom(socket) {
+  const { currentChatRoom } = socket
+  if (!currentChatRoom) return
+  await leaveSocketRoom(socket, currentChatRoom)
+  socket.currentChatRoom = null
+  socket.nsp.to(currentChatRoom).emit(protocol.RES_LEFT, {
+    room: currentChatRoom,
+    chatId: socket.chatId,
   })
+  if (currentChatRoom !== Lobby) {
+    await joinChatRoom(socket, Lobby)
+  }
+  socket.emit(protocol.REQ_LEAVE)
 }
 
 function broadcastMessageToRoom(socket, message) {
@@ -112,14 +106,47 @@ function broadcastMessageToRoom(socket, message) {
   })
 }
 
-function sendInvitation(socket, { chatId, room }) {
-  socket.server.sockets[chatId].emit(protocol.RES_INVITED, { chatId: socket.chatId, room }, () => {
-    socket.emit(protocol.REQ_INVITE)
-  })
+function sendInvitation(socket, { chatId, room: chatRoom }) {
+  const receiver = status.people[chatId]
+  if (receiver) {
+    receiver.emit(protocol.RES_INVITED, { chatId: socket.chatId, room: chatRoom })
+  }
+  socket.emit(protocol.REQ_INVITE)
+}
+
+function sendPeopleOtherRooms(socket) {
+  const people = Object.keys(status.people).reduce((list, otherChatId) => {
+    const other = status.people[otherChatId]
+    const isMe = otherChatId === socket.chatId
+    const sameChatRoom = other.currentChatRoom === socket.currentChatRoom
+    if (!isMe && !sameChatRoom) {
+      list.push(otherChatId)
+    }
+    return list
+  }, [])
+  socket.emit(protocol.REQ_PEOPLE_OTHER_ROOMS, people)
 }
 
 function broadcast(socket) {
-  return socket.nsp.to(socket.currentRoom)
+  return socket.nsp.to(socket.currentChatRoom)
+}
+
+function joinSocketRoom(socket, chatRoom) {
+  return new Promise((resolve) => {
+    socket.join(chatRoom, () => {
+      status.chatRooms[chatRoom].countPeople++
+      resolve()
+    })
+  })
+}
+
+function leaveSocketRoom(socket, chatRoom) {
+  return new Promise((resolve) => {
+    socket.leave(chatRoom, () => {
+      status.chatRooms[chatRoom].countPeople--
+      resolve()
+    })
+  })
 }
 
 function attachFileHandler(socket) {
@@ -169,12 +196,14 @@ module.exports = (server) => {
 
     socket.on(protocol.REQ_ROOM_INFO, sendRoomInfo.bind(null, socket))
 
-    socket.on(protocol.REQ_JOIN, (room) => joinRoom(socket, socket.currentRoom, room))
+    socket.on(protocol.REQ_JOIN, (chatRoom) => joinChatRoom(socket, chatRoom))
 
-    socket.on(protocol.REQ_LEAVE, () => leaveRoom(socket, socket.currentRoom))
+    socket.on(protocol.REQ_LEAVE, () => leaveChatRoom(socket))
 
     socket.on(protocol.REQ_MESSAGE, broadcastMessageToRoom.bind(null, socket))
 
     socket.on(protocol.REQ_INVITE, sendInvitation.bind(null, socket))
+
+    socket.on(protocol.REQ_PEOPLE_OTHER_ROOMS, sendPeopleOtherRooms.bind(null, socket))
   })
 }

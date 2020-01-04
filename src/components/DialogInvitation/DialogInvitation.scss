@@ -3,8 +3,13 @@
 
 .dialog {
   &-select-user {
+    padding: 20px;
+    width: 120px;
+    height: 40px;
+    line-height: $base-line-height;
+
     &-label {
-      margin-bottom: $half-spacer;
+      margin-bottom: $spacer;
     }
   }
 }

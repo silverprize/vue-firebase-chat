@@ -1,7 +1,9 @@
 <template>
   <ChatFrame>
     <ChatFrameHeader>
-      채팅방
+      <h4 class="chat-rooms-header">
+        채팅방
+      </h4>
     </ChatFrameHeader>
     <ChatFrameBody>
       <ul class="chat-rooms-list">

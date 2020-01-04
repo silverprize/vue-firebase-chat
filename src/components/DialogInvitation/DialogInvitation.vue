@@ -16,14 +16,28 @@
         v-model="guest"
         class="dialog-select-user"
       >
-        <option>1234</option>
+        <template v-if="people.length">
+          <option
+            v-for="chatId in people"
+            :key="chatId"
+          >
+            {{ chatId }}
+          </option>
+        </template>
+        <option
+          v-else
+          disabled
+          value=""
+        >
+          초대할 사람이 없습니다.
+        </option>
       </select>
     </div>
   </VDialog>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import './DialogInvitation.scss'
 import VDialog from '@/components/VDialog/VDialog.vue'
 
@@ -31,10 +45,21 @@ import VDialog from '@/components/VDialog/VDialog.vue'
   components: { VDialog },
 })
 export default class DialogInvitation extends Vue {
-  guest = '1234'
+  guest = ''
+
+  @Prop({ type: Array, default: () => ([]) })
+  readonly people!: string[]
 
   ok() {
-    this.$emit('ok', this.guest)
+    if (this.guest) {
+      this.$emit('ok', this.guest)
+    }
+  }
+
+  created() {
+    if (this.people.length) {
+      this.guest = this.people[0]
+    }
   }
 }
 </script>

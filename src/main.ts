@@ -17,6 +17,7 @@ dayjs.locale('ko')
 
 Component.registerHooks([
   'beforeRouteEnter',
+  'beforeRouteUpdate',
   'beforeRouteLeave',
 ])
 

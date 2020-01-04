@@ -6,60 +6,42 @@ import {
   REQ_JOIN,
   REQ_LEAVE,
   REQ_MESSAGE,
-  REQ_PEOPLE_IN_ROOM,
+  REQ_PEOPLE_OTHER_ROOMS,
   REQ_REGISTER_ID,
   REQ_ROOM_INFO,
   REQ_ROOM_LIST,
-  RES_IMAGE_UPLOADED,
-  RES_INVITED,
-  RES_JOINED,
-  RES_LEFT,
-  RES_NEW_MESSAGE,
 } from '@/../server/protocol.js'
 
 type ListenerInfo = {
   event: string,
   listener: Function
+  callback: Function
 }
 const socket = SocketIO({
   autoConnect: false,
 })
 const uploader = new SocketIOFileClient(socket)
-const roomEventListeners: ListenerInfo[] = []
+let socketEventListeners: ListenerInfo[] = []
 
-socket.on('disconnect', () => {
-  console.info('disconnected')
-})
-
-function addEventListener(event: string, listener: Function, container: ListenerInfo[]) {
-  container.push({
-    event,
-    listener,
-  })
-  socket.on(event, listener)
-}
-
-function listenRoomEvent(callback: (event: string, args: any) => void) {
-  [
-    RES_NEW_MESSAGE,
-    RES_JOINED,
-    RES_LEFT,
-    RES_IMAGE_UPLOADED,
-  ].forEach((event) => {
-    addEventListener(event, (data: any) => callback(event, data), roomEventListeners)
+function setSocketEventListener(eventList: string[], listener: (event: string, args: any) => void) {
+  eventList.forEach(event => {
+    const callback = (data: any) => listener(event, data)
+    socketEventListeners.push({
+      event,
+      listener,
+      callback,
+    })
+    socket.on(event, callback)
   })
 }
 
-function stopListenRoomEvent() {
-  roomEventListeners.forEach(({ event, listener }) => socket.off(event, listener))
-}
-
-function listenInviteEvent(callback: (args: any) => void) {
-  socket.off(RES_INVITED, callback)
-}
-
-function stopListenInviteEvent(callback: Function) {
-  socket.off(RES_INVITED, callback)
+function removeSocketEventListener(listener: Function) {
+  socketEventListeners = socketEventListeners.filter(info => {
+    if (info.listener === listener) {
+      socket.off(info.event, info.callback)
+    }
+    return info.listener !== listener
+  })
 }
 
 function connect(id: string) {
@@ -90,17 +72,17 @@ function fetchRoomList(): Promise<Room[]> {
   })
 }
 
-function fetchRoomInfo(roomName: string) {
+function fetchRoomInfo(room: string) {
   return new Promise((resolve) => {
     socket.once(REQ_ROOM_INFO, resolve)
-    socket.emit(REQ_ROOM_INFO, roomName)
+    socket.emit(REQ_ROOM_INFO, room)
   })
 }
 
-function getPeopleInRoom(roomName: string) {
+function fetchAllPeople(): Promise<string[]> {
   return new Promise((resolve) => {
-    socket.once(REQ_PEOPLE_IN_ROOM, resolve)
-    socket.emit(REQ_PEOPLE_IN_ROOM, roomName)
+    socket.once(REQ_PEOPLE_OTHER_ROOMS, resolve)
+    socket.emit(REQ_PEOPLE_OTHER_ROOMS)
   })
 }
 
@@ -120,17 +102,17 @@ function dispatchMessage(message: MessageParams) {
   })
 }
 
-function invite(params: { userId: string, roomName: string }) {
+function invite(params: { chatId: string, room: string }) {
   return new Promise((resolve) => {
     socket.once(REQ_INVITE, resolve)
     socket.emit(REQ_INVITE, params)
   })
 }
 
-function join(roomName: string) {
+function join(room: string) {
   return new Promise((resolve) => {
     socket.once(REQ_JOIN, resolve)
-    socket.emit(REQ_JOIN, roomName)
+    socket.emit(REQ_JOIN, room)
   })
 }
 
@@ -145,14 +127,12 @@ export {
   connect,
   disconnect,
   fetchRoomList,
-  getPeopleInRoom,
   fetchRoomInfo,
+  fetchAllPeople,
   dispatchMessage,
   invite,
   join,
   leave,
-  listenRoomEvent,
-  stopListenRoomEvent,
-  listenInviteEvent,
-  stopListenInviteEvent,
+  setSocketEventListener,
+  removeSocketEventListener,
 }
