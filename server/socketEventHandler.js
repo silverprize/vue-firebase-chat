@@ -40,6 +40,13 @@ function connected(socket) {
   socket.on(protocol.BUILTIN_DISCONNECT, async () => {
     // registerId 실패한 클라이언트는 chatId가 없음.
     if (socket.chatId) {
+      // 나가기가 아닌 다른 경로로 접속을 끊었을때 퇴장 메시지 전파하기.
+      if (socket.currentChatRoom !== Lobby) {
+        broadcast(socket).emit(protocol.RES_LEFT, {
+          room: socket.currentChatRoom,
+          chatId: socket.chatId,
+        })
+      }
       await leaveSocketRoom(socket, socket.currentChatRoom)
       delete status.people[socket.chatId]
       status.countTotalPeople--
@@ -96,7 +103,7 @@ async function leaveChatRoom(socket) {
   if (!currentChatRoom) return
   await leaveSocketRoom(socket, currentChatRoom)
   socket.currentChatRoom = null
-  socket.nsp.to(currentChatRoom).emit(protocol.RES_LEFT, {
+  broadcast(socket).emit(protocol.RES_LEFT, {
     room: currentChatRoom,
     chatId: socket.chatId,
   })
