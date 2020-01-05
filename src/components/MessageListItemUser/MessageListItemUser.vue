@@ -31,9 +31,10 @@
           class="message-list-item-user-balloon__content"
           :class="{ 'message-list-item-user-balloon__content_color_yellow': isMyMessage }"
         >
-          <template v-if="isText">
-            {{ message.content }}
-          </template>
+          <pre
+            v-if="isText"
+            class="message-list-item-user-balloon__content-text"
+          >{{ message.content }}</pre>
           <div
             v-else-if="isImage"
             class="message-list-item-user-balloon__content-image-wrapper"

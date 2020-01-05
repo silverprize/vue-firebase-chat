@@ -95,6 +95,13 @@
         }
       }
 
+      &-text {
+        display: block;
+        margin: 0;
+        font-family: inherit;
+        white-space: pre-wrap;
+      }
+
       &-image {
         max-width: $frame-max-width / 3;
         max-height: $frame-max-width / 3;
