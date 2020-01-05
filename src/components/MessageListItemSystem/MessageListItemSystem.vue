@@ -13,5 +13,9 @@ import { Message } from '@/types'
 export default class MessageListItemSystem extends Vue {
   @Prop({ type: Object, required: true })
   readonly message!: Message
+
+  mounted() {
+    this.$emit('message-loaded')
+  }
 }
 </script>
