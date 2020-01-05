@@ -36,14 +36,16 @@ status.chatRooms = chatRoomNames.concat(Lobby).reduce((map, name) => {
 }, {})
 
 function connected(socket) {
-  console.info('connected: ', socket.id)
-  socket.on(protocol.BUILTIN_DISCONNECT, () => {
-    if (socket.currentChatRoom) {
-      leaveSocketRoom(socket, socket.currentChatRoom)
+  console.info('connected:', socket.id)
+  socket.on(protocol.BUILTIN_DISCONNECT, async () => {
+    // registerId 실패한 클라이언트는 chatId가 없음.
+    if (socket.chatId) {
+      await leaveSocketRoom(socket, socket.currentChatRoom)
+      delete status.people[socket.chatId]
+      status.countTotalPeople--
     }
-    delete status.people[socket.chatId]
-    status.countTotalPeople--
-    console.info('disconnected: ', socket.id, socket.chatId, socket.currentChatRoom, status.countTotalPeople, status.chatRooms)
+    console.info('disconnected:', socket.id, socket.chatId, socket.currentChatRoom)
+    printStatus()
   })
 }
 
@@ -54,6 +56,8 @@ async function registerId(socket, id) {
     status.people[id] = socket
     status.countTotalPeople++
     await joinChatRoom(socket, Lobby)
+    console.info('registered:', socket.id, socket.chatId, socket.currentChatRoom)
+    printStatus()
   }
   socket.emit(protocol.REQ_REGISTER_ID, exists ? '접속중인 아이디입니다.' : null)
 }
@@ -147,6 +151,10 @@ function leaveSocketRoom(socket, chatRoom) {
       resolve()
     })
   })
+}
+
+function printStatus() {
+  console.info('status:', status.countTotalPeople, status.chatRooms)
 }
 
 function attachFileHandler(socket) {
