@@ -7,16 +7,16 @@
   }
 }
 
-@mixin flex($direction: null, $valign: null, $halign: null) {
+@mixin flex($direction: null, $align-items: null, $justify-content: null) {
   display: flex;
   @if $direction {
     flex-direction: $direction;
   }
-  @if $valign {
-    align-items: $valign;
+  @if $align-items {
+    align-items: $align-items;
   }
-  @if $halign {
-    justify-content: $halign;
+  @if $justify-content {
+    justify-content: $justify-content;
   }
 }
 
