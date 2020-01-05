@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import './VDialog.scss'
+import './VModal.scss'
 import VButton from '@/components/VButton/VButton.vue'
 
 @Component({

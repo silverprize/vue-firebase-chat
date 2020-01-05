@@ -1,5 +1,5 @@
 <template>
-  <VDialog
+  <VModal
     :ok-label="okLabel"
     :close-label="closeLabel"
     v-on="$listeners"
@@ -13,15 +13,15 @@
         {{ message }}
       </div>
     </div>
-  </VDialog>
+  </VModal>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import VDialog from '@/components/VDialog/VDialog.vue'
+import VModal from '@/components/VModal/VModal.vue'
 
 @Component({
-  components: { VDialog },
+  components: { VModal },
 })
 export default class DialogMessage extends Vue {
   @Prop(Array)

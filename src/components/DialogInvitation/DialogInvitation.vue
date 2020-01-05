@@ -1,5 +1,5 @@
 <template>
-  <VDialog
+  <VModal
     ok-label="초대"
     @ok="ok"
     @close="$emit('close')"
@@ -35,16 +35,16 @@
         </option>
       </select>
     </div>
-  </VDialog>
+  </VModal>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import './DialogInvitation.scss'
-import VDialog from '@/components/VDialog/VDialog.vue'
+import VModal from '@/components/VModal/VModal.vue'
 
 @Component({
-  components: { VDialog },
+  components: { VModal },
 })
 export default class DialogInvitation extends Vue {
   guest = ''

@@ -1,5 +1,5 @@
 <template>
-  <VDialog
+  <VModal
     ok-label="수락"
     v-on="$listeners"
   >
@@ -11,15 +11,15 @@
         <strong>{{ room }}</strong> 방으로 초대했습니다.
       </div>
     </div>
-  </VDialog>
+  </VModal>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import VDialog from '@/components/VDialog/VDialog.vue'
+import VModal from '@/components/VModal/VModal.vue'
 
 @Component({
-  components: { VDialog },
+  components: { VModal },
 })
 export default class DialogConfirmInvitation extends Vue {
   @Prop({ type: String, required: true })
