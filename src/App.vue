@@ -2,7 +2,7 @@
   <div id="app">
     <RouterView />
     <div
-      v-if="isSpinnerRunning"
+      v-show="isSpinnerRunning"
       class="global-spinner"
     >
       <VSpinner />
