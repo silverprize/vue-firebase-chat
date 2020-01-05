@@ -29,11 +29,13 @@
           class="main__input"
           type="text"
           placeholder="홍길동"
+          autocomplete="off"
         >
       </div>
       <VButton
         type="submit"
         variant="brown"
+        :disabled="!validId"
         @click="connect"
       >
         접속
@@ -64,6 +66,10 @@ export default class PageMain extends mixins(GlobalSpinnerHandler) {
   id: string = ''
   message: string = ''
 
+  get validId() {
+    return this.id.trim()
+  }
+
   @Ref()
   readonly idElement!: HTMLElement
 
@@ -74,10 +80,6 @@ export default class PageMain extends mixins(GlobalSpinnerHandler) {
   readonly connectToServer!: (id: string) => Promise<void>
 
   async connect() {
-    if (!this.id.trim()) {
-      this.message = '아이디를 입력하세요.'
-      return
-    }
     this.startSpinner()
     try {
       await this.connectToServer(this.id)
