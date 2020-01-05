@@ -44,9 +44,10 @@
 
 <script lang="ts">
 import { Component, Ref } from 'vue-property-decorator'
-import { Action } from 'vuex-class'
+import { Action, Mutation } from 'vuex-class'
 import { mixins } from 'vue-class-component'
 import './PageMain.scss'
+import { NEW_SOCKET } from '@/store/mutations.type'
 import { CONNECT } from '@/store/session/actions.type'
 import RouteName from '@/router/route.name'
 import VAlert from '@/components/VAlert/VAlert.vue'
@@ -66,6 +67,9 @@ export default class PageMain extends mixins(GlobalSpinnerHandler) {
   @Ref()
   readonly idElement!: HTMLElement
 
+  @Mutation(NEW_SOCKET)
+  readonly newSocket!: () => void
+
   @Action(CONNECT)
   readonly connectToServer!: (id: string) => Promise<void>
 
@@ -81,6 +85,7 @@ export default class PageMain extends mixins(GlobalSpinnerHandler) {
         name: RouteName.ChatRoomList,
       })
     } catch (e) {
+      this.newSocket()
       this.message = e.message
     }
     this.stopSpinner()

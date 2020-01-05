@@ -1,34 +1,35 @@
 @import '../../scss/variables';
 @import '../../scss/mixins';
 
-.chat-rooms {
+.chat-room-list {
   &-header {
     margin: 0;
   }
 
-  &-list {
+  &-rooms {
     list-style: none;
     margin: 0;
     padding-left: 0;
 
-    &__item {
-      &:first-child {
-        margin-top: $spacer / 4;
-      }
-      margin: 0 $spacer / 4 $spacer / 4 $spacer / 4;
+  }
 
-      &-content {
-        display: flex;
-        font-size: 1.2rem;
-        border-radius: $default-border-radius;
-        padding: $spacer;
-        background-color: $light-color;
-        align-items: center;
-        justify-content: space-between;
-        cursor: pointer;
-        @include hover(null, $grey-color);
-        @include box-shadow();
-      }
+  &-room {
+    &:first-child {
+      margin-top: $spacer / 4;
+    }
+    margin: 0 $spacer / 4 $spacer / 4 $spacer / 4;
+
+    &__content {
+      display: flex;
+      font-size: 1.2rem;
+      border-radius: $default-border-radius;
+      padding: $spacer;
+      background-color: $light-color;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      @include hover(null, $grey-color);
+      @include box-shadow();
     }
   }
 }

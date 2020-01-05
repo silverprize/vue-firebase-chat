@@ -16,13 +16,15 @@ import {
 import { Message, MessageContentType, Room } from '@/types'
 import {
   DISPATCH_MESSAGE,
-  FETCH_ROOM_INFO,
-  FETCH_ROOM_LIST,
+  FETCH_ALL_PEOPLE,
+  UPDATE_ROOM_INFO,
+  UPDATE_ROOM_LIST,
   JOIN_ROOM,
   LEAVE_ROOM,
+  SEND_INVITATION,
 } from '@/store/chat/actions.type'
-import { dispatchMessage, fetchRoomInfo, fetchRoomList, join, leave } from '@/services/chat'
 import { FileInfo } from 'socket.io-file-client'
+import { RootState } from '@/store'
 
 interface State {
   roomList: []
@@ -32,13 +34,13 @@ interface State {
   imageMessageMap: { [key: string]: Message }
 }
 
-const blankRoom = { name: '', countPeople: 0 }
-const chat: Module<State, any> = {
+const dummyRoom = { name: '', countPeople: 0 }
+const chat: Module<State, RootState> = {
   state: {
     roomList: [],
     people: [],
     messageList: [],
-    room: blankRoom,
+    room: dummyRoom,
     imageMessageMap: {},
   },
   getters: {
@@ -72,28 +74,35 @@ const chat: Module<State, any> = {
       state.messageList = []
       state.roomList = []
       state.people = []
-      state.room = blankRoom
+      state.room = dummyRoom
     },
   },
   actions: {
-    [FETCH_ROOM_LIST]: async ({ commit }) => {
-      const roomList = await fetchRoomList()
+    [UPDATE_ROOM_LIST]: async ({ rootState, commit }) => {
+      const roomList = await rootState.socket.fetchRoomList()
       commit(SET_ROOM_LIST, roomList)
     },
-    [FETCH_ROOM_INFO]: async ({ commit }, room) => {
-      const roomInfo = await fetchRoomInfo(room)
+    [UPDATE_ROOM_INFO]: async ({ rootState, commit }, room) => {
+      const roomInfo = await rootState.socket.fetchRoomInfo(room)
       commit(SET_ROOM, roomInfo)
     },
-    [DISPATCH_MESSAGE]: async ({ commit }, message) => {
-      await dispatchMessage(message)
+    [FETCH_ALL_PEOPLE]: async ({ rootState }) => {
+      const people = await rootState.socket.fetchAllPeople()
+      return people
     },
-    [JOIN_ROOM]: async ({ dispatch }, room) => {
-      await join(room)
-      await dispatch(FETCH_ROOM_INFO, room)
+    [DISPATCH_MESSAGE]: async ({ rootState, commit }, message) => {
+      await rootState.socket.dispatchMessage(message)
     },
-    [LEAVE_ROOM]: async ({ commit }) => {
-      await leave()
+    [JOIN_ROOM]: async ({ rootState, dispatch }, room) => {
+      await rootState.socket.join(room)
+      await dispatch(UPDATE_ROOM_INFO, room)
+    },
+    [LEAVE_ROOM]: async ({ rootState, commit }) => {
+      await rootState.socket.leave()
       commit(CLEAR)
+    },
+    [SEND_INVITATION]: async ({ rootState }, { chatId, room }) => {
+      await rootState.socket.invite({ chatId, room })
     },
   },
 }

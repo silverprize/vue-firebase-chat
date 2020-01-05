@@ -1,16 +1,16 @@
 <template>
   <ChatFrame>
     <ChatFrameHeader>
-      <h4 class="chat-rooms-header">
+      <h4 class="chat-room-list-header">
         채팅방
       </h4>
     </ChatFrameHeader>
     <ChatFrameBody>
-      <ul class="chat-rooms-list">
+      <ul class="chat-room-list-rooms">
         <li
           v-for="{ name, countPeople } in roomList"
           :key="name"
-          class="chat-rooms-list__item"
+          class="chat-room-list-room"
         >
           <router-link
             v-slot="{ href, navigate }"
@@ -20,7 +20,7 @@
             }"
           >
             <a
-              class="chat-rooms-list__item-content"
+              class="chat-room-list-room__content"
               :href="href"
               @click="navigate"
             >
@@ -32,7 +32,6 @@
       </ul>
     </ChatFrameBody>
     <VButton
-      class="chat-rooms__btn_exit"
       variant="yellow"
       @click="exit"
     >
@@ -50,6 +49,7 @@ import { mixins } from 'vue-class-component'
 import './PageChatRoomList.scss'
 import { DISCONNECT } from '@/store/session/actions.type'
 import { GET_ROOM_LIST } from '@/store/chat/getters.type'
+import { UPDATE_ROOM_LIST } from '@/store/chat/actions.type'
 import RouteName from '@/router/route.name'
 import VButton from '@/components/VButton/VButton.vue'
 import VBadge from '@/components/VBadge/VBadge.vue'
@@ -57,41 +57,40 @@ import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
 import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader.vue'
 import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody.vue'
-import { FETCH_ROOM_LIST } from '@/store/chat/actions.type'
 
-@Component<PageChatRooms>({
+@Component<PageChatRoomList>({
   components: { ChatFrameBody, ChatFrameHeader, ChatFrame, VBadge, VButton },
 })
-export default class PageChatRooms extends mixins(GlobalSpinnerHandler) {
+export default class PageChatRoomList extends mixins(GlobalSpinnerHandler) {
   readonly RouteName = RouteName
 
   @Getter(GET_ROOM_LIST)
   readonly roomList!: []
 
-  @Action(FETCH_ROOM_LIST)
-  readonly fetchRoomList!: () => Promise<void>
+  @Action(UPDATE_ROOM_LIST)
+  readonly updateRoomList!: () => Promise<void>
 
   @Action(DISCONNECT)
-  readonly disconnectFromServer!: () => Promise<void>
+  readonly disconnect!: () => Promise<void>
 
   exit() {
     this.$router.replace({ name: RouteName.Main })
   }
 
   async beforeRouteEnter(to: Route, from: Route, next: Function) {
-    next(async (vm: PageChatRooms) => {
+    next(async (vm: PageChatRoomList) => {
       vm.startSpinner()
-      await vm.fetchRoomList()
+      await vm.updateRoomList()
       vm.stopSpinner()
     })
   }
 
+  // 채팅방 목록을 나가는 경우는 두가지, 접속 페이지로 이동과 채팅방 입장.
+  // 접속 페이지로 이동할땐 연결해제.
   async beforeRouteLeave(to: Route, from: Route, next: Function) {
-    if (to.name !== RouteName.ChatRoom) {
+    if (to.name === RouteName.Main) {
       this.startSpinner()
-      try {
-        await this.disconnectFromServer()
-      } catch (e) {}
+      await this.disconnect()
       this.stopSpinner()
     }
     next()

@@ -3,7 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import beforeEach from './beforeEach'
 import RouteName from '@/router/route.name'
 import main from '@/router/main'
-import chat from '@/router/chat'
+import chat from '@/router/chat-base'
 
 Vue.use(VueRouter)
 
@@ -22,7 +22,8 @@ const router = new VueRouter({
   routes,
 })
 
-// 서버 연결중이 아니면 아이디 입력으로 이동
+// 접속 페이지가 아닌 다른 페이지로 접근 했을때,
+// 서버 연결중이 아니면 접속 페이지로 이동하도록 확인
 router.beforeEach(beforeEach)
 
 export default router

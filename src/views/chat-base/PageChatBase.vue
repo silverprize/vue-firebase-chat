@@ -1,6 +1,5 @@
-import { RES_JOINED } from "@/../server/protocol.js"import { RES_LEFT } from "@/../server/protocol.js"
 <template>
-  <div class="chat">
+  <div class="chat-base">
     <RouterView />
     <DialogInvitation
       v-if="dialogProps[Dialog.INVITATION].visible"
@@ -31,20 +30,20 @@ import { Component } from 'vue-property-decorator'
 import { mixins } from 'vue-class-component'
 import { Action, Mutation } from 'vuex-class'
 
-import './PageChat.scss'
+import './PageChatBase.scss'
 import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/eventBus.event.name'
-import { FETCH_ROOM_LIST } from '@/store/chat/actions.type'
+import { FETCH_ALL_PEOPLE, UPDATE_ROOM_LIST, SEND_INVITATION } from '@/store/chat/actions.type'
 import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol.js'
 import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
 import DialogInvitation from '@/components/DialogInvitation/DialogInvitation.vue'
 import DialogConfirmInvitation from '@/components/DialogConfirmInvitation/DialogConfirmInvitation.vue'
 import VPage from '@/components/VPage/VPage.vue'
 import eventBus from '@/services/eventBus'
-import { fetchAllPeople, invite, removeSocketEventListener, setSocketEventListener } from '@/services/chat'
 import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import RouteName from '@/router/route.name'
-import { CLEAR } from '@/store/session/mutations.type'
 import DialogMessage from '@/components/DialogMessage/DialogMessage.vue'
+import { REMOVE_SOCKET_EVENT_LISTENER, SET_SOCKET_EVENT_LISTENER } from '@/store/mutations.type'
+import { CLEAR } from '@/store/session/mutations.type'
 
 type InvitationRequest = {
   inviter: string
@@ -95,24 +94,36 @@ export default class PageChat extends mixins(GlobalSpinnerHandler) {
     return this.$route.name === RouteName.ChatRoomList
   }
 
+  @Mutation(SET_SOCKET_EVENT_LISTENER)
+  readonly setSocketEventListener!: (params: { event: string[], callback: Function }) => void
+
+  @Mutation(REMOVE_SOCKET_EVENT_LISTENER)
+  readonly removeSocketEventListener!: (callback: Function) => void
+
   @Mutation(CLEAR)
   readonly clearSession!: () => void
 
-  @Action(FETCH_ROOM_LIST)
+  @Action(UPDATE_ROOM_LIST)
   readonly updateRoomList!: () => Promise<void>
+
+  @Action(FETCH_ALL_PEOPLE)
+  readonly fetchAllPeople!: () => Promise<string[]>
+
+  @Action(SEND_INVITATION)
+  readonly sendInvitation!: (params: { chatId: string, room: string}) => Promise<void>
 
   async inviteeSelected(chatId: string) {
     const dialogProps = this.dialogProps[Dialog.INVITATION]
     this.closeDialog(Dialog.INVITATION)
     this.startSpinner()
-    await invite({
+    await this.sendInvitation({
       chatId,
       room: dialogProps.room,
     })
     this.stopSpinner()
   }
 
-  async invitationAccepted() {
+  invitationAccepted() {
     const { room, invitationRequestList } = this.dialogProps[Dialog.CONFIRM_INVITATION]
     this.$router.push({ name: RouteName.ChatRoom, params: { room } })
     this.closeDialog(Dialog.CONFIRM_INVITATION)
@@ -157,7 +168,7 @@ export default class PageChat extends mixins(GlobalSpinnerHandler) {
   async openInvitationDialog(targetRoom: string) {
     const dialogProps = this.dialogProps[Dialog.INVITATION]
     dialogProps.room = targetRoom
-    dialogProps.people = await fetchAllPeople()
+    dialogProps.people = await this.fetchAllPeople()
     this.openDialog(Dialog.INVITATION)
   }
 
@@ -228,17 +239,20 @@ export default class PageChat extends mixins(GlobalSpinnerHandler) {
   }
 
   created() {
-    setSocketEventListener([
-      BUILTIN_DISCONNECT,
-      RES_JOINED,
-      RES_LEFT,
-      RES_INVITED,
-    ], this.socketEventReceived)
+    this.setSocketEventListener({
+      event: [
+        BUILTIN_DISCONNECT,
+        RES_JOINED,
+        RES_LEFT,
+        RES_INVITED,
+      ],
+      callback: this.socketEventReceived,
+    })
     eventBus.listen(this, OPEN_INVITATION_DIALOG, this.openInvitationDialog)
   }
 
   destroyed() {
-    removeSocketEventListener(this.socketEventReceived)
+    this.removeSocketEventListener(this.socketEventReceived)
   }
 }
 </script>

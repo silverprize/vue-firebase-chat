@@ -1,14 +1,14 @@
 import { Module } from 'vuex'
-import { CONNECT, DISCONNECT } from './actions.type'
 import { CLEAR, SET_ID } from './mutations.type'
 import { GET_ID, IS_CONNECTING } from './getters.type'
-import { connect, disconnect } from '@/services/chat'
+import { RootState } from '@/store'
+import { CONNECT, DISCONNECT } from '@/store/session/actions.type'
 
 interface State {
   chatId: string
 }
 
-const module: Module<State, any> = {
+const module: Module<State, RootState> = {
   state: {
     chatId: '',
   },
@@ -25,12 +25,12 @@ const module: Module<State, any> = {
     },
   },
   actions: {
-    [CONNECT]: async ({ commit }, id) => {
-      await connect(id)
+    [CONNECT]: async ({ rootState, commit }, id) => {
+      await rootState.socket.connect(id)
       commit(SET_ID, id)
     },
-    [DISCONNECT]: async ({ commit }) => {
-      await disconnect()
+    [DISCONNECT]: async ({ rootState, commit }) => {
+      await rootState.socket.disconnect()
       commit(CLEAR)
     },
   },

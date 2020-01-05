@@ -1,6 +1,3 @@
-import { RES_LEFT } from "@/../server/protocol.js"import { RES_IMAGE_UPLOADED } from "@/../server/protocol.js"
-import { RES_JOINED } from "@/../server/protocol.js"
-import { RES_NEW_MESSAGE } from "@/../server/protocol.js"
 <template>
   <ChatFrame>
     <ChatFrameHeader class="chat-room__header">
@@ -77,10 +74,10 @@ import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody.vue'
 import ChatFrameInputPanel from '@/components/ChatFrameInputPanel/ChatFrameInputPanel.vue'
 import eventBus from '@/services/eventBus'
 import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/eventBus.event.name'
-import { DISPATCH_MESSAGE, FETCH_ROOM_INFO, JOIN_ROOM, LEAVE_ROOM } from '@/store/chat/actions.type'
+import { DISPATCH_MESSAGE, JOIN_ROOM, LEAVE_ROOM, UPDATE_ROOM_INFO } from '@/store/chat/actions.type'
 import { ADD_MESSAGE, SET_IMAGE_URL } from '@/store/chat/mutations.type'
 import { RES_IMAGE_UPLOADED, RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol.js'
-import { removeSocketEventListener, setSocketEventListener } from '@/services/chat'
+import { REMOVE_SOCKET_EVENT_LISTENER, SET_SOCKET_EVENT_LISTENER } from '@/store/mutations.type'
 
 @Component({
   components: {
@@ -123,6 +120,12 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
   @Mutation(SET_IMAGE_URL)
   readonly updateMessageImage!: (message: Message) => void
 
+  @Mutation(SET_SOCKET_EVENT_LISTENER)
+  readonly setSocketEventListener!: (params: { event: string[], callback: Function }) => void
+
+  @Mutation(REMOVE_SOCKET_EVENT_LISTENER)
+  readonly removeSocketEventListener!: (callback: Function) => void
+
   @Action(JOIN_ROOM)
   readonly dispatchJoin!: (roomName: string) => Promise<void>
 
@@ -132,7 +135,7 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
   @Action(DISPATCH_MESSAGE)
   readonly dispatchMessage!: (message: MessageParams) => Promise<void>
 
-  @Action(FETCH_ROOM_INFO)
+  @Action(UPDATE_ROOM_INFO)
   readonly updateRoomInfo!: (room: string) => Promise<void>
 
   leave() {
@@ -171,23 +174,24 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
 
   async joinRoom(room: string) {
     this.startSpinner()
-    removeSocketEventListener(this.socketEventReceived)
-    setSocketEventListener([
-      RES_NEW_MESSAGE,
-      RES_JOINED,
-      RES_LEFT,
-      RES_IMAGE_UPLOADED,
-    ], this.socketEventReceived)
+    this.removeSocketEventListener(this.socketEventReceived)
+    this.setSocketEventListener({
+      event: [
+        RES_NEW_MESSAGE,
+        RES_JOINED,
+        RES_LEFT,
+        RES_IMAGE_UPLOADED,
+      ],
+      callback: this.socketEventReceived,
+    })
     await this.dispatchJoin(room)
     this.stopSpinner()
   }
 
   async leaveRoom() {
     this.startSpinner()
-    removeSocketEventListener(this.socketEventReceived)
-    try {
-      await this.dispatchLeave()
-    } catch (e) {}
+    this.removeSocketEventListener(this.socketEventReceived)
+    await this.dispatchLeave()
     this.stopSpinner()
   }
 
@@ -239,9 +243,7 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
 
   async beforeRouteLeave(to: Route, from: Route, next: () => void) {
     if (to.name !== RouteName.ChatRoom) {
-      try {
-        await this.leaveRoom()
-      } catch (e) {}
+      await this.leaveRoom()
     }
     next()
   }

@@ -5,7 +5,7 @@ import chatRoomList from '../chat-room-list'
 
 const chat: RouteConfig = {
   path: '/chat',
-  component: () => import(/* webpackChunkName: "chat" */ '@/views/chat/PageChat.vue'),
+  component: () => import(/* webpackChunkName: "chat" */ '@/views/chat-base/PageChatBase.vue'),
   redirect: { name: RouteName.ChatRoomList },
   children: [
     chatRoom,
