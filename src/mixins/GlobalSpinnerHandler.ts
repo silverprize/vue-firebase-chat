@@ -1,6 +1,6 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { Mutation } from 'vuex-class'
-import { SET_BUSY } from '@/store/global/mutations.type'
+import { SET_BUSY } from '@/store/mutations.type'
 
 @Component
 export default class GlobalSpinnerHandler extends Vue {
