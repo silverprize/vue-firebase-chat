@@ -1,16 +1,17 @@
 {
   "name": "kakaopay-chat",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "start": "node ./server/index.js"
+    "start": "node ./server/index.js",
+    "preinstall": "cd server && npm i"
   },
   "dependencies": {
-    "core-js": "^3.4.4",
+    "core-js": "^3.6.1",
     "dayjs": "^1.8.18",
     "socket.io-client": "^2.3.0",
     "socket.io-file-client": "^2.0.2",
@@ -33,12 +34,12 @@
     "@vue/cli-service": "^4.1.0",
     "@vue/eslint-config-standard": "^4.0.0",
     "@vue/eslint-config-typescript": "^4.0.0",
-    "@vue/test-utils": "1.0.0-beta.29",
+    "@vue/test-utils": "^1.0.0-beta.29",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
-    "node-sass": "^4.12.0",
+    "node-sass": "^4.13.0",
     "sass-loader": "^8.0.0",
-    "typescript": "~3.5.3",
+    "typescript": "~3.6.2",
     "vue-template-compiler": "^2.6.10"
   }
 }
