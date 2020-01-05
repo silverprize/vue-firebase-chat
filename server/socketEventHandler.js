@@ -84,6 +84,10 @@ async function joinChatRoom(socket, chatRoom) {
     room: chatRoom,
     chatId: socket.chatId,
   })
+  socket.to(Lobby).emit(protocol.RES_JOINED, {
+    room: chatRoom,
+    chatId: socket.chatId,
+  })
   socket.emit(protocol.REQ_JOIN)
 }
 
