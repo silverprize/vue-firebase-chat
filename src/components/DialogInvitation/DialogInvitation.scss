@@ -4,9 +4,8 @@
 .dialog {
   &-select-user {
     padding-left: 10px;
-    width: 120px;
-    height: 40px;
-    font-size: 1.2rem;
+    min-width: 160px;
+    height: 36px;
 
     &-label {
       margin-bottom: $spacer;
