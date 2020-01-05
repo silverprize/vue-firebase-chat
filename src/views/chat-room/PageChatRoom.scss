@@ -8,6 +8,7 @@
 
   &__header {
     @include flex(null, null, space-between);
+    flex-shrink: 0;
   }
 
   &__title {

@@ -3,9 +3,10 @@
 
 .chat-frame {
   &-input-panel {
+    @include flex(column);
+    flex-shrink: 0;
     background-color: $light-color;
     border-top: 1px solid $grey-border-color;
-    @include flex(column);
 
     &__menu {
       @include flex();
