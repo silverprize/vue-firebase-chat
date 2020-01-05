@@ -32,11 +32,11 @@
       ref="inputPanel"
       @text-submitted="inputTextInformed"
     >
-      <template v-slot:menu>
+      <template v-slot:menu="{ focusInput }">
         <VFile
           class="chat-frame-input-panel__menu-item"
           accept="image/*"
-          @files-selected="imageInformed"
+          @files-selected="imageInformed($event, focusInput)"
         >
           사진 올리기
         </VFile>
@@ -154,8 +154,9 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
     this.sendTextMessage({ content: text, contentType: MessageContentType.Text })
   }
 
-  imageInformed(files: FileList) {
+  imageInformed(files: FileList, focusTextarea: () => void) {
     this.sendTextMessage({ content: files, contentType: MessageContentType.Image })
+    focusTextarea()
   }
 
   async sendTextMessage({

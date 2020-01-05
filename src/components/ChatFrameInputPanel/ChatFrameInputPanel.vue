@@ -1,7 +1,10 @@
 <template>
   <div class="chat-frame-input-panel">
     <div class="chat-frame-input-panel__menu">
-      <slot name="menu" />
+      <slot
+        name="menu"
+        v-bind="{ focusInput }"
+      />
     </div>
     <div class="chat-frame-input-panel__input-area">
       <label
