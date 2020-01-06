@@ -5,6 +5,7 @@ const uuid = require('uuid')
 const protocol = require('./protocol')
 
 const imageBaseUrl = process.env.VUE_APP_IMAGE_BASE_URL
+
 const Lobby = 'Lobby'
 const Moon = 'Moon'
 const Mercury = 'Mercury'
@@ -42,7 +43,7 @@ function connected(socket) {
     if (socket.chatId) {
       // 나가기가 아닌 다른 경로로 접속을 끊었을때 퇴장 메시지 전파하기.
       if (socket.currentChatRoom !== Lobby) {
-        broadcast(socket).emit(protocol.RES_LEFT, {
+        broadcastToChatRoom(socket, socket.currentChatRoom).emit(protocol.RES_LEFT, {
           room: socket.currentChatRoom,
           chatId: socket.chatId,
         })
@@ -103,7 +104,7 @@ async function leaveChatRoom(socket) {
   if (!currentChatRoom) return
   await leaveSocketRoom(socket, currentChatRoom)
   socket.currentChatRoom = null
-  broadcast(socket).emit(protocol.RES_LEFT, {
+  broadcastToChatRoom(socket, currentChatRoom).emit(protocol.RES_LEFT, {
     room: currentChatRoom,
     chatId: socket.chatId,
   })
@@ -113,9 +114,9 @@ async function leaveChatRoom(socket) {
   socket.emit(protocol.REQ_LEAVE)
 }
 
-function broadcastMessageToRoom(socket, message) {
+function sendMessageToChatRoom(socket, message) {
   socket.emit(protocol.REQ_MESSAGE)
-  broadcast(socket).emit(protocol.RES_NEW_MESSAGE, {
+  broadcastToChatRoom(socket, socket.currentChatRoom).emit(protocol.RES_NEW_MESSAGE, {
     ...message,
     sentAt: new Date().toISOString(),
   })
@@ -129,7 +130,7 @@ function sendInvitation(socket, { chatId, room: chatRoom }) {
   socket.emit(protocol.REQ_INVITE)
 }
 
-function sendPeopleOtherRooms(socket) {
+function sendPeopleInOtherRooms(socket) {
   const people = Object.keys(status.people).reduce((list, otherChatId) => {
     const other = status.people[otherChatId]
     const isMe = otherChatId === socket.chatId
@@ -142,8 +143,8 @@ function sendPeopleOtherRooms(socket) {
   socket.emit(protocol.REQ_PEOPLE_OTHER_ROOMS, people)
 }
 
-function broadcast(socket) {
-  return socket.nsp.to(socket.currentChatRoom)
+function broadcastToChatRoom(socket, chatRoom) {
+  return socket.nsp.to(chatRoom)
 }
 
 function joinSocketRoom(socket, chatRoom) {
@@ -180,14 +181,14 @@ function attachFileHandler(socket) {
   })
   uploader.on('stream', (fileInfo) => {
     if (fileInfo.wrote <= chunkSize) {
-      broadcastMessageToRoom(socket, {
+      sendMessageToChatRoom(socket, {
         ...fileInfo.data,
         uploadId: fileInfo.uploadId,
       })
     }
   })
   uploader.on('complete', (fileInfo) => {
-    broadcast(socket).emit(protocol.RES_IMAGE_UPLOADED, {
+    broadcastToChatRoom(socket, socket.currentChatRoom).emit(protocol.RES_IMAGE_UPLOADED, {
       ...fileInfo,
       url: `${imageBaseUrl}/${fileInfo.name}`,
     })
@@ -219,10 +220,10 @@ module.exports = (server) => {
 
     socket.on(protocol.REQ_LEAVE, () => leaveChatRoom(socket))
 
-    socket.on(protocol.REQ_MESSAGE, broadcastMessageToRoom.bind(null, socket))
+    socket.on(protocol.REQ_MESSAGE, sendMessageToChatRoom.bind(null, socket))
 
     socket.on(protocol.REQ_INVITE, sendInvitation.bind(null, socket))
 
-    socket.on(protocol.REQ_PEOPLE_OTHER_ROOMS, sendPeopleOtherRooms.bind(null, socket))
+    socket.on(protocol.REQ_PEOPLE_OTHER_ROOMS, sendPeopleInOtherRooms.bind(null, socket))
   })
 }

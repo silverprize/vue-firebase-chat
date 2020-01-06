@@ -10,7 +10,7 @@ import {
   SET_BUSY,
   SET_SOCKET_EVENT_LISTENER,
 } from '@/store/mutations.type'
-import Socket from '@/services/socket'
+import Socket from '@/services/Socket'
 
 Vue.use(Vuex)
 

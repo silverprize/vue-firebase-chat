@@ -31,7 +31,7 @@ import { mixins } from 'vue-class-component'
 import { Action, Mutation } from 'vuex-class'
 
 import './PageChatBase.scss'
-import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/eventBus.event.name'
+import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
 import { FETCH_ALL_PEOPLE, UPDATE_ROOM_LIST, SEND_INVITATION } from '@/store/chat/actions.type'
 import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol.js'
 import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
@@ -65,7 +65,7 @@ enum Dialog {
 @Component({
   components: { DialogMessage, VPage, DialogConfirmInvitation, DialogInvitation, ChatFrame },
 })
-export default class PageChat extends mixins(GlobalSpinnerHandler) {
+export default class PageChatBase extends mixins(GlobalSpinnerHandler) {
   dialogProps = {
     [Dialog.INVITATION]: {
       visible: false,

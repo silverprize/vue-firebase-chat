@@ -18,7 +18,7 @@ type ListenerInfo = {
   callback: Function
 }
 
-export default class Index {
+export default class Socket {
   socket: SocketIOClient.Socket
   uploader: SocketIOFileClient
   socketEventListeners: ListenerInfo[] = []
