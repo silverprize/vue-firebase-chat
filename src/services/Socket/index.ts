@@ -19,21 +19,23 @@ type ListenerInfo = {
 }
 
 export default class Socket {
+  socketIoOptions = {
+    autoConnect: false,
+    reconnection: false,
+    forceNew: true,
+  }
+
   socket: SocketIOClient.Socket
   uploader: SocketIOFileClient
   socketEventListeners: ListenerInfo[] = []
 
-  constructor() {
-    this.socket = this.createSocketIO()
+  constructor(socketIoOptions = {}) {
+    this.socketIoOptions = {
+      ...this.socketIoOptions,
+      ...socketIoOptions,
+    }
+    this.socket = SocketIO(this.socketIoOptions)
     this.uploader = new SocketIOFileClient(this.socket)
-  }
-
-  private createSocketIO() {
-    return SocketIO({
-      autoConnect: false,
-      reconnection: false,
-      forceNew: true,
-    })
   }
 
   private runAfterTestConnection(event: string, resolve: () => void, ...args: any[]) {
@@ -68,9 +70,7 @@ export default class Socket {
 
   connect(id: string) {
     return new Promise((resolve, reject) => {
-      const connectErrored = () => {
-        reject(new Error('서버에 연결할 수 없습니다.'))
-      }
+      const connectErrored = () => reject(new Error('서버에 연결할 수 없습니다.'))
       this.socket.connect()
       this.socket.once('connect', () => {
         this.socket.once(REQ_REGISTER_ID, async (err?: string) => {
@@ -100,8 +100,8 @@ export default class Socket {
     this.uploader.upload(files, ...args)
   }
 
-  // 이미지 전송시 uploader.upload메소드가 emit을 대신함.
-  // 이미지 수신 시작할때 REQ_MESSAGE 응답함.
+  // 이미지 전송시 upload메소드가 emit을 대신함.
+  // 서버에서 이미지 수신 시작할때 REQ_MESSAGE 응답함.
   dispatchMessage(message: MessageParams) {
     return new Promise(async (resolve) => {
       if (this.isDisconnected()) {
