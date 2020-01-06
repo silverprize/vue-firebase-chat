@@ -42,7 +42,7 @@
         </VFile>
         <VButton
           class="chat-frame-input-panel__menu-item"
-          @click="openInviteDialog"
+          @click="openInvitationDialog"
         >
           초대
         </VButton>
@@ -142,7 +142,7 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
     this.$router.replace({ name: RouteName.ChatRoomList })
   }
 
-  openInviteDialog() {
+  openInvitationDialog() {
     eventBus.send(OPEN_INVITATION_DIALOG, this.roomName)
   }
 
@@ -237,6 +237,7 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
   }
 
   async beforeRouteUpdate(to: Route, from: Route, next: Function) {
+    this.removeSocketEventListener(this.socketEventReceived)
     await this.joinRoom(to.params.room)
     next()
   }
