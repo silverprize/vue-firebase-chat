@@ -43,7 +43,7 @@ function connected(socket) {
     if (socket.chatId) {
       // 나가기가 아닌 다른 경로로 접속을 끊었을때 퇴장 메시지 전파하기.
       if (socket.currentChatRoom !== Lobby) {
-        broadcastToChatRoom(socket, socket.currentChatRoom).emit(protocol.RES_LEFT, {
+        getChatRoomBroadcaster(socket, socket.currentChatRoom).emit(protocol.RES_LEFT, {
           room: socket.currentChatRoom,
           chatId: socket.chatId,
         })
@@ -88,7 +88,7 @@ async function joinChatRoom(socket, chatRoom) {
   }
   await joinSocketRoom(socket, chatRoom)
   socket.currentChatRoom = chatRoom
-  socket.nsp.to(chatRoom).emit(protocol.RES_JOINED, {
+  getChatRoomBroadcaster(socket, chatRoom).emit(protocol.RES_JOINED, {
     room: chatRoom,
     chatId: socket.chatId,
   })
@@ -104,7 +104,7 @@ async function leaveChatRoom(socket) {
   if (!currentChatRoom) return
   await leaveSocketRoom(socket, currentChatRoom)
   socket.currentChatRoom = null
-  broadcastToChatRoom(socket, currentChatRoom).emit(protocol.RES_LEFT, {
+  getChatRoomBroadcaster(socket, currentChatRoom).emit(protocol.RES_LEFT, {
     room: currentChatRoom,
     chatId: socket.chatId,
   })
@@ -116,7 +116,7 @@ async function leaveChatRoom(socket) {
 
 function sendMessageToChatRoom(socket, message) {
   socket.emit(protocol.REQ_MESSAGE)
-  broadcastToChatRoom(socket, socket.currentChatRoom).emit(protocol.RES_NEW_MESSAGE, {
+  getChatRoomBroadcaster(socket, socket.currentChatRoom).emit(protocol.RES_NEW_MESSAGE, {
     ...message,
     sentAt: new Date().toISOString(),
   })
@@ -143,7 +143,7 @@ function sendPeopleInOtherRooms(socket) {
   socket.emit(protocol.REQ_PEOPLE_OTHER_ROOMS, people)
 }
 
-function broadcastToChatRoom(socket, chatRoom) {
+function getChatRoomBroadcaster(socket, chatRoom) {
   return socket.nsp.to(chatRoom)
 }
 
@@ -188,7 +188,7 @@ function attachFileHandler(socket) {
     }
   })
   uploader.on('complete', (fileInfo) => {
-    broadcastToChatRoom(socket, socket.currentChatRoom).emit(protocol.RES_IMAGE_UPLOADED, {
+    getChatRoomBroadcaster(socket, socket.currentChatRoom).emit(protocol.RES_IMAGE_UPLOADED, {
       ...fileInfo,
       url: `${imageBaseUrl}/${fileInfo.name}`,
     })
