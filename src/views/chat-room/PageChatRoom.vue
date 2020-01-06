@@ -175,7 +175,6 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
 
   async joinRoom(room: string) {
     this.startSpinner()
-    this.removeSocketEventListener(this.socketEventReceived)
     this.setSocketEventListener({
       event: [
         RES_NEW_MESSAGE,
