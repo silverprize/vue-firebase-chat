@@ -17,9 +17,7 @@ async function serve(ctx, next) {
   let i = 0
   do {
     const root = roots[i++]
-    try {
-      done = await sendFile(ctx, root, filePath)
-    } catch (e) {}
+    done = await sendFile(ctx, root, filePath)
   } while (!done && i < roots.length)
   if (!done) {
     await next()
@@ -45,7 +43,7 @@ async function index(ctx) {
   }
 }
 
-const port = 3000
+const port = process.env.PORT || 3000
 const app = new Koa()
 app.use(serve).use(index)
 
