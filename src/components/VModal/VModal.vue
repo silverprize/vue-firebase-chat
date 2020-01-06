@@ -32,7 +32,7 @@ import VButton from '@/components/VButton/VButton.vue'
 @Component({
   components: { VButton },
 })
-export default class VDialog extends Vue {
+export default class VModal extends Vue {
   @Prop({ type: String, default: '확인' })
   readonly okLabel!: string
 
