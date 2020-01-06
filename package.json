@@ -8,7 +8,7 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "start": "node ./server/index.js",
-    "preinstall": "cd server && npm i"
+    "postinstall": "cd server && npm i"
   },
   "dependencies": {
     "core-js": "^3.6.1",
@@ -36,10 +36,15 @@
     "@vue/eslint-config-typescript": "^4.0.0",
     "@vue/test-utils": "^1.0.0-beta.29",
     "eslint": "^5.16.0",
+    "eslint-plugin-node": "^7.0.1",
     "eslint-plugin-vue": "^5.0.0",
     "node-sass": "^4.13.0",
     "sass-loader": "^8.0.0",
     "typescript": "^3.5.3",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.10",
+    "webpack": "^4.41.5"
+  },
+  "engines": {
+    "node": ">=12"
   }
 }

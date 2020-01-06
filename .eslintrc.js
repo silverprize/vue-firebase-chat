@@ -3,7 +3,7 @@ module.exports = {
   env: {
     node: true,
   },
-  'extends': [
+  extends: [
     'plugin:vue/recommended',
     '@vue/standard',
     '@vue/typescript',
@@ -12,12 +12,9 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'comma-dangle': ['error', 'always-multiline'],
+    'space-before-function-paren': ['error', { anonymous: 'always', 'asyncArrow': 'always', named: 'never' }],
     'no-useless-constructor': 'off',
     '@typescript-eslint/no-useless-constructor': 'error',
-    'space-before-function-paren': [
-      'error',
-      { anonymous: 'always', 'asyncArrow': 'always', named: 'never' },
-    ],
   },
   parserOptions: {
     parser: '@typescript-eslint/parser',
