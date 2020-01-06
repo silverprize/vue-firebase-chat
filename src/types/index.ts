@@ -11,6 +11,12 @@ export enum KeyCode {
   Enter = 13,
 }
 
+export enum Dialog {
+  INVITATION,
+  CONFIRM_INVITATION,
+  MESSAGE,
+}
+
 export type Message = {
   type: MessageType
   content: string

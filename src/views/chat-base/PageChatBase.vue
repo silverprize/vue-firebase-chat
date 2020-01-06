@@ -32,7 +32,7 @@ import { Action, Mutation } from 'vuex-class'
 
 import './PageChatBase.scss'
 import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
-import { FETCH_ALL_PEOPLE, UPDATE_ROOM_LIST, SEND_INVITATION } from '@/store/chat/actions.type'
+import { FETCH_ALL_PEOPLE, SEND_INVITATION, UPDATE_ROOM_LIST } from '@/store/chat/actions.type'
 import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol.js'
 import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
 import DialogInvitation from '@/components/DialogInvitation/DialogInvitation.vue'
@@ -44,6 +44,7 @@ import RouteName from '@/router/route.name'
 import DialogMessage from '@/components/DialogMessage/DialogMessage.vue'
 import { REMOVE_SOCKET_EVENT_LISTENER, SET_SOCKET_EVENT_LISTENER } from '@/store/mutations.type'
 import { CLEAR } from '@/store/session/mutations.type'
+import { Dialog } from '@/types'
 
 type InvitationRequest = {
   inviter: string
@@ -54,12 +55,6 @@ type MessageRequest = {
   messageList: string[]
   okLabel: string
   closeLabel: string
-}
-
-enum Dialog {
-  INVITATION,
-  CONFIRM_INVITATION,
-  MESSAGE,
 }
 
 @Component({
