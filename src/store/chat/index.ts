@@ -93,13 +93,13 @@ const chat: Module<State, RootState> = {
     [DISPATCH_MESSAGE]: async ({ rootState, commit }, message) => {
       await rootState.socket.dispatchMessage(message)
     },
-    [JOIN_ROOM]: async ({ rootState, dispatch }, room) => {
+    [JOIN_ROOM]: async ({ rootState, commit, dispatch }, room) => {
+      commit(CLEAR)
       await rootState.socket.join(room)
       await dispatch(UPDATE_ROOM_INFO, room)
     },
     [LEAVE_ROOM]: async ({ rootState, commit }) => {
       await rootState.socket.leave()
-      commit(CLEAR)
     },
     [SEND_INVITATION]: async ({ rootState }, { chatId, room }) => {
       await rootState.socket.invite({ chatId, room })
