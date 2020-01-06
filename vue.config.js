@@ -1,5 +1,13 @@
 const imageBaseUrl = process.env.VUE_APP_IMAGE_BASE_URL
 module.exports = {
+  configureWebpack: {
+    optimization: {
+      splitChunks: {
+        minSize: 10000,
+        maxSize: 250000,
+      },
+    },
+  },
   devServer: {
     proxy: {
       [`^${imageBaseUrl}`]: {
