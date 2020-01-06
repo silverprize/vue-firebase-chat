@@ -5,7 +5,13 @@ import Vuex from 'vuex'
 import storeOptions from '@/store/options'
 import RouteName from '@/router/route.name'
 import ChatFrameInputPanel from '@/components/ChatFrameInputPanel/ChatFrameInputPanel.vue'
-import { KeyCode, MessageContentType } from '@/types'
+import { MessageContentType } from '@/types'
+import eventBus from '@/services/eventBus'
+import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
+
+jest.mock('@/services/eventBus', () => ({
+  send: jest.fn(),
+}))
 
 const setEnableSpinner = jest.fn()
 const localVue = createLocalVue()
@@ -51,7 +57,7 @@ describe('PageChatRoom.vue', () => {
     expect(dispatchJoin).toHaveBeenCalledWith(room)
   })
 
-  it('채팅방 페이지 나가면 소켓이벤트 리스너 제거하고 서버에 퇴장 요청.', async () => {
+  it('채팅방 페이지를 떠날때 소켓이벤트 리스너 제거하고 서버에 퇴장 요청.', async () => {
     const dispatchLeave = jest.fn()
     const setSocketEventListener = jest.fn()
     const removeSocketEventListener = jest.fn()
@@ -74,7 +80,7 @@ describe('PageChatRoom.vue', () => {
     expect(dispatchLeave).toHaveBeenCalled()
   })
 
-  it('"메시지"를 입력하고 엔터키를 치면 서버에 전송.', () => {
+  it('"메시지"를 입력하고 엔터키 치면 서버에 전송.', () => {
     const message = '메시지'
     const dispatchMessage = jest.fn()
     const mockOptions: MountOptions<PageChatRoom> = {
@@ -95,5 +101,21 @@ describe('PageChatRoom.vue', () => {
       contentType: MessageContentType.Text,
       senderId: '',
     })
+  })
+
+  it('초대 메뉴를 누르면 요청자가 속한 방이름을 파라미터로 초대요청 다이얼로그 오픈 이벤트 밠송.(eventBus.send)', () => {
+    const room = 'room'
+    const mockOptions: MountOptions<PageChatRoom> = {
+      ...baseMockOptions,
+      methods: {
+        ...baseMockMethods,
+      },
+      computed: {
+        roomName: () => room,
+      },
+    }
+    const wrapper = mount(PageChatRoom, mockOptions)
+    wrapper.findAll('.chat-frame-input-panel__menu-item').at(1).trigger('click')
+    expect(eventBus.send).toHaveBeenCalledWith(OPEN_INVITATION_DIALOG, room)
   })
 })
