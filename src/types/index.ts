@@ -1,38 +1,55 @@
-export enum MessageType {
+enum MessageType {
   User,
   System,
 }
-export enum MessageContentType {
+
+enum MessageContentType {
   Text,
   Image,
 }
 
-export enum KeyCode {
+enum KeyCode {
   Enter = 13,
 }
 
-export enum Dialog {
+enum Dialog {
   INVITATION,
   CONFIRM_INVITATION,
   MESSAGE,
 }
 
-export type Message = {
-  type: MessageType
-  content: string
-  contentType: MessageContentType
-  senderId: string
-  sentAt: string
-  uploadId?: string
+interface Message {
+  type: MessageType;
+  content: string;
+  contentType: MessageContentType;
+  senderId: string;
+  sentAt: string;
+  uploadId?: string;
 }
 
-export type MessageParams = {
-  content: string | FileList
-  contentType: MessageContentType
-  senderId: string
+interface MessageParams {
+  content: string | FileList;
+  contentType: MessageContentType;
+  senderId: string;
 }
 
-export type Room = {
-  name: string
-  countPeople: number
+interface Room {
+  name: string;
+  countPeople: number;
+}
+
+type RouteEnterNext<T> = (next: (vm: T) => any) => void
+
+type RouteNext = (next?: boolean) => void
+
+export {
+  MessageType,
+  MessageContentType,
+  KeyCode,
+  Dialog,
+  Message,
+  MessageParams,
+  Room,
+  RouteEnterNext,
+  RouteNext,
 }

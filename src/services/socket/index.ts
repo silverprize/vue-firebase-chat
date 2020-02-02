@@ -12,10 +12,10 @@ import {
 } from '@/../server/protocol.js'
 import { MessageContentType, MessageParams, Room } from '@/types'
 
-type ListenerInfo = {
-  event: string,
-  listener: Function
-  callback: Function
+interface ListenerInfo {
+  event: string;
+  listener: Function;
+  callback: Function;
 }
 
 export default class Socket {
@@ -103,7 +103,7 @@ export default class Socket {
   // 이미지 전송시 upload메소드가 emit을 대신함.
   // 서버에서 이미지 수신 시작할때 REQ_MESSAGE 응답함.
   dispatchMessage(message: MessageParams) {
-    return new Promise(async (resolve) => {
+    return new Promise((resolve) => {
       if (this.isDisconnected()) {
         resolve()
       } else {
@@ -140,7 +140,7 @@ export default class Socket {
     })
   }
 
-  invite(params: { chatId: string, room: string }) {
+  invite(params: { chatId: string; room: string }) {
     return new Promise((resolve) => {
       this.runAfterTestConnection(REQ_INVITE, resolve, params)
     })

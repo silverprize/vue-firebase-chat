@@ -27,11 +27,11 @@ import { FileInfo } from 'socket.io-file-client'
 import { RootState } from '@/store'
 
 interface State {
-  roomList: []
-  people: []
-  messageList: Message[]
-  room: Room
-  imageMessageMap: { [key: string]: Message }
+  roomList: [];
+  people: [];
+  messageList: Message[];
+  room: Room;
+  imageMessageMap: { [key: string]: Message };
 }
 
 const dummyRoom = { name: '', countPeople: 0 }
@@ -86,11 +86,10 @@ const chat: Module<State, RootState> = {
       const roomInfo = await rootState.socket.fetchRoomInfo(room)
       commit(SET_ROOM, roomInfo)
     },
-    [FETCH_ALL_PEOPLE]: async ({ rootState }) => {
-      const people = await rootState.socket.fetchAllPeople()
-      return people
+    [FETCH_ALL_PEOPLE]: ({ rootState }) => {
+      return rootState.socket.fetchAllPeople()
     },
-    [DISPATCH_MESSAGE]: async ({ rootState, commit }, message) => {
+    [DISPATCH_MESSAGE]: async ({ rootState }, message) => {
       await rootState.socket.dispatchMessage(message)
     },
     [JOIN_ROOM]: async ({ rootState, commit, dispatch }, room) => {
@@ -98,7 +97,7 @@ const chat: Module<State, RootState> = {
       await rootState.socket.join(room)
       await dispatch(UPDATE_ROOM_INFO, room)
     },
-    [LEAVE_ROOM]: async ({ rootState, commit }) => {
+    [LEAVE_ROOM]: async ({ rootState }) => {
       await rootState.socket.leave()
     },
     [SEND_INVITATION]: async ({ rootState }, { chatId, room }) => {

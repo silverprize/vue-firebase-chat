@@ -16,7 +16,7 @@
             v-slot="{ href, navigate }"
             :to="{
               name: RouteName.ChatRoom,
-              params: { room: name },
+              params: { room: name }
             }"
           >
             <a
@@ -57,6 +57,7 @@ import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
 import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader.vue'
 import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody.vue'
+import { RouteEnterNext, RouteNext } from '@/types'
 
 @Component<PageChatRoomList>({
   components: { ChatFrameBody, ChatFrameHeader, ChatFrame, VBadge, VButton },
@@ -77,8 +78,8 @@ export default class PageChatRoomList extends mixins(GlobalSpinnerHandler) {
     this.$router.replace({ name: RouteName.Main })
   }
 
-  async beforeRouteEnter(to: Route, from: Route, next: Function) {
-    next(async (vm: PageChatRoomList) => {
+  async beforeRouteEnter(to: Route, from: Route, next: RouteEnterNext<PageChatRoomList>) {
+    next(async (vm) => {
       vm.startSpinner()
       await vm.updateRoomList()
       vm.stopSpinner()
@@ -87,7 +88,7 @@ export default class PageChatRoomList extends mixins(GlobalSpinnerHandler) {
 
   // 채팅방 목록을 나가는 경우는 두가지, 접속 페이지로 이동과 채팅방 입장.
   // 접속 페이지로 이동할땐 연결해제.
-  async beforeRouteLeave(to: Route, from: Route, next: Function) {
+  async beforeRouteLeave(to: Route, from: Route, next: RouteNext) {
     if (to.name === RouteName.Main) {
       this.startSpinner()
       await this.disconnect()

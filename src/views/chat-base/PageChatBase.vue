@@ -47,14 +47,14 @@ import { CLEAR } from '@/store/session/mutations.type'
 import { Dialog } from '@/types'
 
 type InvitationRequest = {
-  inviter: string
-  room: string
+  inviter: string;
+  room: string;
 }
 
 type MessageRequest = {
-  messageList: string[]
-  okLabel: string
-  closeLabel: string
+  messageList: string[];
+  okLabel: string;
+  closeLabel: string;
 }
 
 @Component({
@@ -90,7 +90,7 @@ export default class PageChatBase extends mixins(GlobalSpinnerHandler) {
   }
 
   @Mutation(SET_SOCKET_EVENT_LISTENER)
-  readonly setSocketEventListener!: (params: { event: string[], callback: Function }) => void
+  readonly setSocketEventListener!: (params: { event: string[]; callback: Function }) => void
 
   @Mutation(REMOVE_SOCKET_EVENT_LISTENER)
   readonly removeSocketEventListener!: (callback: Function) => void
@@ -105,7 +105,7 @@ export default class PageChatBase extends mixins(GlobalSpinnerHandler) {
   readonly fetchAllPeople!: () => Promise<string[]>
 
   @Action(SEND_INVITATION)
-  readonly sendInvitation!: (params: { chatId: string, room: string}) => Promise<void>
+  readonly sendInvitation!: (params: { chatId: string; room: string}) => Promise<void>
 
   async inviteeSelected(chatId: string) {
     const dialogProps = this.dialogProps[Dialog.INVITATION]
@@ -167,7 +167,7 @@ export default class PageChatBase extends mixins(GlobalSpinnerHandler) {
     this.openDialog(Dialog.INVITATION)
   }
 
-  openConfirmInvitationDialog({ chatId, room }: { chatId: string, room: string }) {
+  openConfirmInvitationDialog({ chatId, room }: { chatId: string; room: string }) {
     const dialogProps = this.dialogProps[Dialog.CONFIRM_INVITATION]
     if (dialogProps.visible) {
       dialogProps.invitationRequestList.push({
@@ -181,7 +181,7 @@ export default class PageChatBase extends mixins(GlobalSpinnerHandler) {
     }
   }
 
-  openMessageDialog(args: { messageList: string[], okLabel: string, closeLabel: string, disconnected: boolean }) {
+  openMessageDialog(args: { messageList: string[]; okLabel: string; closeLabel: string; disconnected: boolean }) {
     const dialogProps = this.dialogProps[Dialog.MESSAGE]
     if (dialogProps.visible) {
       dialogProps.messageRequestList.push({

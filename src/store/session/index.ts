@@ -5,7 +5,7 @@ import { RootState } from '@/store'
 import { CONNECT, DISCONNECT } from '@/store/session/actions.type'
 
 interface State {
-  chatId: string
+  chatId: string;
 }
 
 const module: Module<State, RootState> = {

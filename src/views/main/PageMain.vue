@@ -63,8 +63,8 @@ import VPage from '@/components/VPage/VPage.vue'
   components: { VPage, ChatFrame, VButton, VSpinner, VAlert },
 })
 export default class PageMain extends mixins(GlobalSpinnerHandler) {
-  id: string = ''
-  message: string = ''
+  id = ''
+  message = ''
 
   get validId() {
     return this.id.trim()

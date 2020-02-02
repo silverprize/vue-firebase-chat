@@ -1,7 +1,7 @@
 import { StoreOptions } from 'vuex'
 import session from '@/store/session'
 import chat from '@/store/chat'
-import Socket from '@/services/Socket'
+import Socket from '@/services/socket'
 import { GET_SOCKET, IS_BUSY } from './getters.type'
 import {
   NEW_SOCKET,

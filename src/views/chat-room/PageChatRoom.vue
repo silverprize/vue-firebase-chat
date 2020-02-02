@@ -60,7 +60,7 @@ import { mixins } from 'vue-class-component'
 import './PageChatRoom.scss'
 import { GET_ID } from '@/store/session/getters.type'
 import { GET_COUNT_PEOPLE, GET_MESSAGE_LIST, GET_ROOM_NAME } from '@/store/chat/getters.type'
-import { Message, MessageContentType, MessageParams, MessageType } from '@/types'
+import { Message, MessageContentType, MessageParams, MessageType, RouteEnterNext, RouteNext } from '@/types'
 import RouteName from '@/router/route.name'
 import VBadge from '@/components/VBadge/VBadge.vue'
 import VButton from '@/components/VButton/VButton.vue'
@@ -121,7 +121,7 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
   readonly updateMessageImage!: (message: Message) => void
 
   @Mutation(SET_SOCKET_EVENT_LISTENER)
-  readonly setSocketEventListener!: (params: { event: string[], callback: Function }) => void
+  readonly setSocketEventListener!: (params: { event: string[]; callback: Function }) => void
 
   @Mutation(REMOVE_SOCKET_EVENT_LISTENER)
   readonly removeSocketEventListener!: (callback: Function) => void
@@ -163,8 +163,8 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
     content,
     contentType,
   }: {
-    content: string | FileList
-    contentType: MessageContentType
+    content: string | FileList;
+    contentType: MessageContentType;
   }) {
     this.dispatchMessage({
       content,
@@ -230,19 +230,17 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
     this.inputPanel.focusInput()
   }
 
-  async beforeRouteEnter(to: Route, from: Route, next: Function) {
-    next((vm: PageChatRoom) => {
-      vm.joinRoom(to.params.room)
-    })
+  async beforeRouteEnter(to: Route, from: Route, next: RouteEnterNext<PageChatRoom>) {
+    next((vm) => vm.joinRoom(to.params.room))
   }
 
-  async beforeRouteUpdate(to: Route, from: Route, next: Function) {
+  async beforeRouteUpdate(to: Route, from: Route, next: RouteNext) {
     this.removeSocketEventListener(this.socketEventReceived)
     await this.joinRoom(to.params.room)
     next()
   }
 
-  async beforeRouteLeave(to: Route, from: Route, next: () => void) {
+  async beforeRouteLeave(to: Route, from: Route, next: RouteNext) {
     if (to.name !== RouteName.ChatRoom) {
       await this.leaveRoom()
     }

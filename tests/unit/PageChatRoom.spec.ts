@@ -74,7 +74,7 @@ describe('PageChatRoom.vue', () => {
     ;(wrapper.vm as any).beforeRouteLeave(
       { name: RouteName.ChatRoomList } as any,
       null as never,
-      (callback: Function) => {},
+      () => {},
     )
     expect(removeSocketEventListener).toHaveBeenCalledWith((wrapper.vm as any).socketEventReceived)
     expect(dispatchLeave).toHaveBeenCalled()
