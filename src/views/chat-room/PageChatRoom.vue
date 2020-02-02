@@ -18,10 +18,13 @@
       </VButton>
     </ChatFrameHeader>
     <ChatFrameBody ref="talkBoxScrollElement">
-      <MessageList ref="messageListComponent">
-        <MessageListItem
-          v-for="(message) in messageList"
-          :key="message.sentAt"
+      <MessageList
+        ref="messageListComponent"
+        v-slot="{ message }"
+        :message-list="messageList"
+      >
+        <MessageListItemDiscriminator
+          :key="message.id"
           :message="message"
           :is-my-message="message.senderId === me"
           @message-loaded="newMessageLoaded"
@@ -66,7 +69,7 @@ import VBadge from '@/components/VBadge/VBadge.vue'
 import VButton from '@/components/VButton/VButton.vue'
 import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import MessageList from '@/components/MessageList/MessageList.vue'
-import MessageListItem from '@/components/MessageListItem/MessageListItem.vue'
+import MessageListItemDiscriminator from '@/components/MessageListItemDiscriminator/MessageListItemDiscriminator.vue'
 import VFile from '@/components/VFile/VFile.vue'
 import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
 import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader.vue'
@@ -85,7 +88,7 @@ import { REMOVE_SOCKET_EVENT_LISTENER, SET_SOCKET_EVENT_LISTENER } from '@/store
     ChatFrameBody,
     ChatFrameHeader,
     ChatFrame,
-    MessageListItem,
+    MessageListItemDiscriminator,
     MessageList,
     VFile,
     VButton,

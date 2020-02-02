@@ -1,30 +1,22 @@
-import { MessageContentType } from '@/types'
 <template>
-  <li class="message-list-item">
-    <MessageListItemSystem
-      v-if="isSystemMessage"
-      v-bind="$props"
-      v-on="$listeners"
-    />
-    <MessageListItemUser
-      v-else
-      v-bind="$props"
-      v-on="$listeners"
-    />
-  </li>
+  <component
+    :is="isSystemMessage ? MessageListItemSystem : MessageListItemUser"
+    v-bind="$props"
+    v-on="$listeners"
+  />
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import './MessageListItem.scss'
 import { Message, MessageType } from '@/types'
 import MessageListItemUser from '@/components/MessageListItemUser/MessageListItemUser.vue'
 import MessageListItemSystem from '@/components/MessageListItemSystem/MessageListItemSystem.vue'
 
-@Component({
-  components: { MessageListItemSystem, MessageListItemUser },
-})
-export default class MessageListItem extends Vue {
+@Component
+export default class MessageListItemDiscriminator extends Vue {
+  readonly MessageListItemSystem = MessageListItemSystem
+  readonly MessageListItemUser = MessageListItemUser
+
   get isSystemMessage() {
     return this.message.type === MessageType.System
   }

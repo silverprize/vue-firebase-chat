@@ -4,4 +4,12 @@
   list-style: none;
   margin: 0;
   padding: 0;
+
+  &-item {
+    padding-top: $spacer;
+
+    &:last-child {
+      padding-bottom: $spacer;
+    }
+  }
 }

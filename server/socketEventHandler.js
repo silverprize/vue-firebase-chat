@@ -43,10 +43,12 @@ function connected(socket) {
     if (socket.chatId) {
       // 나가기가 아닌 다른 경로로 접속을 끊었을때 퇴장 메시지 전파하기.
       if (socket.currentChatRoom !== Lobby) {
-        getChatRoomBroadcaster(socket, socket.currentChatRoom).emit(protocol.RES_LEFT, {
-          room: socket.currentChatRoom,
-          chatId: socket.chatId,
-        })
+        getChatRoomBroadcaster(socket, socket.currentChatRoom).emit(protocol.RES_LEFT,
+          createNewMessage({
+            room: socket.currentChatRoom,
+            chatId: socket.chatId,
+          }),
+        )
       }
       await leaveSocketRoom(socket, socket.currentChatRoom)
       delete status.people[socket.chatId]
@@ -88,10 +90,10 @@ async function joinChatRoom(socket, chatRoom) {
   }
   await joinSocketRoom(socket, chatRoom)
   socket.currentChatRoom = chatRoom
-  getChatRoomBroadcaster(socket, chatRoom).emit(protocol.RES_JOINED, {
+  getChatRoomBroadcaster(socket, chatRoom).emit(protocol.RES_JOINED, createNewMessage({
     room: chatRoom,
     chatId: socket.chatId,
-  })
+  }))
   socket.to(Lobby).emit(protocol.RES_JOINED, {
     room: chatRoom,
     chatId: socket.chatId,
@@ -104,10 +106,10 @@ async function leaveChatRoom(socket) {
   if (!currentChatRoom) return
   await leaveSocketRoom(socket, currentChatRoom)
   socket.currentChatRoom = null
-  getChatRoomBroadcaster(socket, currentChatRoom).emit(protocol.RES_LEFT, {
+  getChatRoomBroadcaster(socket, currentChatRoom).emit(protocol.RES_LEFT, createNewMessage({
     room: currentChatRoom,
     chatId: socket.chatId,
-  })
+  }))
   if (currentChatRoom !== Lobby) {
     await joinChatRoom(socket, Lobby)
   }
@@ -116,10 +118,7 @@ async function leaveChatRoom(socket) {
 
 function sendMessageToChatRoom(socket, message) {
   socket.emit(protocol.REQ_MESSAGE)
-  getChatRoomBroadcaster(socket, socket.currentChatRoom).emit(protocol.RES_NEW_MESSAGE, {
-    ...message,
-    sentAt: new Date().toISOString(),
-  })
+  getChatRoomBroadcaster(socket, socket.currentChatRoom).emit(protocol.RES_NEW_MESSAGE, createNewMessage(message))
 }
 
 function sendInvitation(socket, { chatId, room: chatRoom }) {
@@ -165,6 +164,16 @@ function leaveSocketRoom(socket, chatRoom) {
   })
 }
 
+function createNewMessage(message) {
+  const time = new Date()
+  return {
+    ...message,
+    id: uuid.v1(),
+    sentAt: time.toISOString(),
+    timestamp: time.getTime(),
+  }
+}
+
 function printStatus() {
   console.info('status:', status.countTotalPeople, status.chatRooms)
 }
@@ -188,10 +197,10 @@ function attachFileHandler(socket) {
     }
   })
   uploader.on('complete', (fileInfo) => {
-    getChatRoomBroadcaster(socket, socket.currentChatRoom).emit(protocol.RES_IMAGE_UPLOADED, {
+    getChatRoomBroadcaster(socket, socket.currentChatRoom).emit(protocol.RES_IMAGE_UPLOADED, createNewMessage({
       ...fileInfo,
       url: `${imageBaseUrl}/${fileInfo.name}`,
-    })
+    }))
   })
   uploader.on('error', (err) => {
     socket.emit(protocol.RES_IMAGE_UPLOADED, err)

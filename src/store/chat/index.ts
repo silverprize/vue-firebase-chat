@@ -63,11 +63,21 @@ const chat: Module<State, RootState> = {
       if (message.contentType === MessageContentType.Image) {
         state.imageMessageMap[message.uploadId as string] = message
       }
-      state.messageList.push(message)
+
+      let insertIndex = 0
+      for (let i = state.messageList.length - 1; i >= 0; i--) {
+        if (state.messageList[i].timestamp < message.timestamp) {
+          insertIndex = i + 1
+          break
+        }
+      }
+      state.messageList.splice(insertIndex, 0, message)
     },
     [SET_IMAGE_URL]: (state, data: FileInfo & { url: string }) => {
       if (state.imageMessageMap[data.uploadId]) {
         state.imageMessageMap[data.uploadId].content = data.url
+        delete state.imageMessageMap[data.uploadId]
+        state.imageMessageMap = { ...state.imageMessageMap }
       }
     },
     [CLEAR]: (state) => {
