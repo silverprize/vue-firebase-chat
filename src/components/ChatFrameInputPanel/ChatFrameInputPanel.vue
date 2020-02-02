@@ -59,17 +59,22 @@ export default class ChatFrameInputPanel extends Vue {
         this.textMessage = this.textMessage.concat('\n')
       } else {
         $event.preventDefault()
-        if (!this.textMessage.trim()) {
-          return
-        }
-        this.$emit('text-submitted', this.textMessage)
-        this.textMessage = ''
+        this.emitText()
       }
     }
   }
 
   sendButtonClicked() {
+    this.emitText()
     this.focusInput()
+  }
+
+  emitText() {
+    if (!this.textMessage.trim()) {
+      return
+    }
+    this.$emit('text-submitted', this.textMessage)
+    this.textMessage = ''
   }
 
   focusInput() {

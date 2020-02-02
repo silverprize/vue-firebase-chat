@@ -108,6 +108,7 @@
 
         &-wrapper {
           @include flex(column, center, center);
+          position: relative;
           min-height: 100px;
         }
       }

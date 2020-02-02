@@ -41,7 +41,7 @@
           >
             <img
               class="message-list-item-user-balloon__content-image"
-              :src="message.content"
+              :src="message.content || null"
               alt=""
               @load.once="contentLoaded"
               @error.once="contentLoaded"
