@@ -7,20 +7,18 @@ const protocol = require('./protocol')
 const imageBaseUrl = process.env.VUE_APP_IMAGE_BASE_URL
 
 const Lobby = 'Lobby'
-const Moon = 'Moon'
-const Mercury = 'Mercury'
-const Mars = 'Mars'
-const Earth = 'Earth'
-const Pluto = 'Pluto'
-const Uranus = 'Uranus'
+const Amazon = 'Amazon'
+const Apple = 'Apple'
+const Facebook = 'Facebook'
+const Netflix = 'Netflix'
+const Google = 'Google'
 
 const chatRoomNames = [
-  Moon,
-  Mercury,
-  Mars,
-  Earth,
-  Pluto,
-  Uranus,
+  Facebook,
+  Amazon,
+  Apple,
+  Netflix,
+  Google,
 ]
 
 const status = {
@@ -35,6 +33,12 @@ status.chatRooms = chatRoomNames.concat(Lobby).reduce((map, name) => {
   }
   return map
 }, {})
+
+let messageSequence = 1
+
+function nextMessageSequence() {
+  return messageSequence++
+}
 
 function connected(socket) {
   console.info('connected:', socket.id)
@@ -168,9 +172,8 @@ function createNewMessage(message) {
   const time = new Date()
   return {
     ...message,
-    id: uuid.v1(),
+    sequence: nextMessageSequence(),
     sentAt: time.toISOString(),
-    timestamp: time.getTime(),
   }
 }
 

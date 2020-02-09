@@ -19,14 +19,13 @@ enum Dialog {
 }
 
 interface Message {
-  id: string;
+  sequence: number;
   type: MessageType;
   content: string;
   contentType: MessageContentType;
   senderId: string;
   sentAt: string;
   uploadId?: string;
-  timestamp: number;
 }
 
 interface MessageParams {

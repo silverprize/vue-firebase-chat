@@ -66,7 +66,7 @@ const chat: Module<State, RootState> = {
 
       let insertIndex = 0
       for (let i = state.messageList.length - 1; i >= 0; i--) {
-        if (state.messageList[i].timestamp < message.timestamp) {
+        if (state.messageList[i].sequence < message.sequence) {
           insertIndex = i + 1
           break
         }

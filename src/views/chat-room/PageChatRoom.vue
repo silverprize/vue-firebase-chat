@@ -24,7 +24,7 @@
         :message-list="messageList"
       >
         <MessageListItemDiscriminator
-          :key="message.id"
+          :key="message.sequence"
           :message="message"
           :is-my-message="message.senderId === me"
           @message-loaded="newMessageLoaded"
