@@ -8,7 +8,7 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "start": "node ./server/index.js",
-    "postinstall": "cd server && npm i"
+    "postinstall": "cd server && yarn"
   },
   "dependencies": {
     "core-js": "^3.6.4",
