@@ -1,7 +1,5 @@
 FROM node:12.5.0
-COPY .env /app/
-COPY dist /app/dist
-COPY server /app/server
-RUN ls /app
-RUN cd /app/server && yarn
+COPY . /app
+RUN npm i -g yarn
+RUN cd /app && yarn && yarn build && cd server && yarn
 CMD cd /app && node server/index.js
