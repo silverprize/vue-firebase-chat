@@ -2,7 +2,7 @@
   <VPage class="main">
     <img
       class="main__logo"
-      src="../../assets/kakao.jpg"
+      src="../../assets/logo.png"
       alt="Logo"
     >
     <VAlert
