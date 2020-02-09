@@ -1,0 +1,5 @@
+dist
+node_modules
+server/images
+server/node_modules
+.git
