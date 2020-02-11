@@ -80,8 +80,19 @@ describe('PageChatRoom.vue', () => {
     expect(dispatchLeave).toHaveBeenCalled()
   })
 
-  it('"메시지"를 입력하고 엔터키 치면 서버에 전송.', () => {
-    const message = '메시지'
+  it('"메시지"를 입력하고 전송 버튼 클릭 또는 엔터키 치면 서버에 전송.', async () => {
+    const messageClick = '클릭 전송 메시지'
+    const messageEnter = '엔터 전송 메시지'
+    const prepareText = async (text: string) => {
+      (textarea.element as HTMLTextAreaElement).value = text
+      textarea.trigger('input')
+      await wrapper.vm.$nextTick()
+    }
+    const createExpectMessage = (content: string) => ({
+      content,
+      contentType: MessageContentType.Text,
+      senderId: '',
+    })
     const dispatchMessage = jest.fn()
     const mockOptions: MountOptions<PageChatRoom> = {
       ...baseMockOptions,
@@ -91,19 +102,21 @@ describe('PageChatRoom.vue', () => {
       },
     }
     const wrapper = mount(PageChatRoom, mockOptions)
+    const sendButton = wrapper.find(ChatFrameInputPanel).find('[type="submit"]')
     const textarea = wrapper.find('textarea')
-    ;(textarea.element as HTMLTextAreaElement).value = message
-    textarea.trigger('input')
-    expect((wrapper.find(ChatFrameInputPanel).vm as any).textMessage).toEqual(message)
+
+    await prepareText(messageEnter)
+    expect((wrapper.find(ChatFrameInputPanel).vm as any).textMessage).toEqual(messageEnter)
     textarea.trigger('keydown.enter')
-    expect(dispatchMessage).toHaveBeenCalledWith({
-      content: message,
-      contentType: MessageContentType.Text,
-      senderId: '',
-    })
+    expect(dispatchMessage).toHaveBeenNthCalledWith(1, createExpectMessage(messageEnter))
+
+    await prepareText(messageClick)
+    expect((wrapper.find(ChatFrameInputPanel).vm as any).textMessage).toEqual(messageClick)
+    sendButton.trigger('click')
+    expect(dispatchMessage).toHaveBeenNthCalledWith(2, createExpectMessage(messageClick))
   })
 
-  it('초대 메뉴를 누르면 요청자가 속한 방이름을 파라미터로 초대요청 다이얼로그 오픈 이벤트 밠송.(eventBus.send)', () => {
+  it('초대 메뉴를 누르면 요청자가 속한 방이름을 파라미터로 초대요청 다이얼로그 오픈 이벤트 발송.(eventBus.send)', () => {
     const room = 'room'
     const mockOptions: MountOptions<PageChatRoom> = {
       ...baseMockOptions,
