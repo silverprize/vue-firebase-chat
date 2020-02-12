@@ -82,7 +82,7 @@ export default class PageMain extends mixins(GlobalSpinnerHandler) {
   async connect() {
     this.startSpinner()
     try {
-      await this.connectToServer(this.id)
+      await this.connectToServer(this.validId)
       this.$router.push({
         name: RouteName.ChatRoomList,
       })

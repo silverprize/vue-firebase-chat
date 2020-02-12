@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import PageMain from '@/views/main/PageMain.vue'
+import RouteName from '@/router/route.name'
 
 const setEnableSpinner = jest.fn()
 
@@ -27,7 +28,7 @@ describe('PageMain.vue', () => {
     expect((wrapper.find('button').element as HTMLButtonElement).disabled).toBeFalsy()
   })
 
-  it('id를 입력하고 로그인을 누르면 채팅방 페이지로.', async () => {
+  it('id를 입력하고 로그인을 누르면 채팅방 페이지로 이동.', async () => {
     const push = jest.fn()
     const connectToServer = jest.fn()
     const wrapper = mount(PageMain, {
@@ -41,11 +42,15 @@ describe('PageMain.vue', () => {
         connectToServer,
       },
     })
-    wrapper.vm.$data.id = 'guest'
-    wrapper.find('button').trigger('click')
-    await wrapper.vm.$nextTick()
+
+    wrapper.setData({ id: 'guest' })
+    await (wrapper.vm as any).connect()
+
+    expect((wrapper.find('#chatId').element as HTMLInputElement).value).toBeTruthy()
     expect(connectToServer).toHaveBeenCalled()
-    expect(push).toHaveBeenCalled()
+    expect(push).toHaveBeenCalledWith({
+      name: RouteName.ChatRoomList,
+    })
   })
 
   it('서버 접속 실패하면 소켓 인스턴스 갱신 호출.', async () => {
@@ -60,9 +65,10 @@ describe('PageMain.vue', () => {
         newSocket,
       },
     })
-    wrapper.vm.$data.id = 'guest'
-    wrapper.find('button').trigger('click')
-    await wrapper.vm.$nextTick()
+
+    wrapper.setData({ id: 'guest' })
+    await (wrapper.vm as any).connect()
+
     expect(newSocket).toHaveBeenCalled()
   })
 })
