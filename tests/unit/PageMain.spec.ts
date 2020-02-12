@@ -5,12 +5,13 @@ import RouteName from '@/router/route.name'
 const setEnableSpinner = jest.fn()
 
 describe('PageMain.vue', () => {
-  it('data id와 input value 바인딩.', () => {
+  it('data id와 input value 바인딩.', async () => {
     const id = 'guest'
-    const wrapper = mount(PageMain, {
-      data: () => ({ id: '' }),
-    })
+    const wrapper = mount(PageMain)
+
     wrapper.setData({ id })
+    await wrapper.vm.$nextTick()
+
     expect((wrapper.find('input').element as HTMLInputElement).value).toMatch(id)
   })
 
