@@ -9,7 +9,7 @@ interface VButtonProps {
 }
 
 interface VButtonEvents {
-  onClick?: ($event: Event) => any
+  onClick($event: Event): void
 }
 
 @Component
