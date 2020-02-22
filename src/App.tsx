@@ -5,9 +5,7 @@ import '@/scss/index.scss'
 import { IS_BUSY } from '@/store/getters.type'
 import VSpinner from '@/components/VSpinner/VSpinner'
 
-@Component({
-  components: { VSpinner },
-})
+@Component
 export default class App extends Vue {
   @Getter(IS_BUSY)
   readonly isSpinnerRunning!: boolean
