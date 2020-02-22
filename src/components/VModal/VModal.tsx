@@ -1,5 +1,6 @@
 import * as tsx from 'vue-tsx-support'
 import { Component, Prop } from 'vue-property-decorator'
+
 import './VModal.scss'
 import VButton from '@/components/VButton/VButton'
 
@@ -9,14 +10,12 @@ interface VModalProps {
 }
 
 interface VModalEvents {
-  ok?: () => void
-  close?: () => void
+  onOk(): void
+  onClose(): void
 }
 
-@Component({
-  components: { VButton },
-})
-export default class VModal extends tsx.Component<VModalProps, {}, VModalEvents> {
+@Component
+export default class VModal extends tsx.Component<VModalProps, VModalEvents> {
   @Prop({ type: String, default: '확인' })
   private readonly okLabel!: string
 
@@ -35,14 +34,14 @@ export default class VModal extends tsx.Component<VModalProps, {}, VModalEvents>
               <VButton
                 variant="light"
                 class="dialog-footer__close-button"
-                onClick={($event) => this.$emit('ok', $event)}
+                onClick={() => this.$emit('close')}
               >
                 {this.closeLabel}
               </VButton>
             }
             <VButton
               variant="yellow"
-              onClick={($event) => this.$emit('close', $event)}
+              onClick={() => this.$emit('ok')}
             >
               {this.okLabel}
             </VButton>
