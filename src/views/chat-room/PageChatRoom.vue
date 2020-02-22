@@ -39,7 +39,7 @@
         <VFile
           class="chat-frame-input-panel__menu-item"
           accept="image/*"
-          @files-selected="imageInformed($event, focusInput)"
+          @onSelectFile="imageInformed($event, focusInput)"
         >
           사진 올리기
         </VFile>
@@ -65,12 +65,12 @@ import { GET_ID } from '@/store/session/getters.type'
 import { GET_COUNT_PEOPLE, GET_MESSAGE_LIST, GET_ROOM_NAME } from '@/store/chat/getters.type'
 import { Message, MessageContentType, MessageParams, MessageType, RouteEnterNext, RouteNext } from '@/types'
 import RouteName from '@/router/route.name'
-import VBadge from '@/components/VBadge/VBadge.vue'
-import VButton from '@/components/VButton/VButton.vue'
+import VBadge from '@/components/VBadge/VBadge'
+import VButton from '@/components/VButton/VButton'
 import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import MessageList from '@/components/MessageList/MessageList.vue'
 import MessageListItemDiscriminator from '@/components/MessageListItemDiscriminator/MessageListItemDiscriminator.vue'
-import VFile from '@/components/VFile/VFile.vue'
+import VFile from '@/components/VFile/VFile'
 import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
 import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader.vue'
 import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody.vue'

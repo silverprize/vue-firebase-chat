@@ -52,12 +52,12 @@ import './PageMain.scss'
 import { NEW_SOCKET } from '@/store/mutations.type'
 import { CONNECT } from '@/store/session/actions.type'
 import RouteName from '@/router/route.name'
-import VAlert from '@/components/VAlert/VAlert.vue'
-import VSpinner from '@/components/VSpinner/VSpinner.vue'
-import VButton from '@/components/VButton/VButton.vue'
+import VAlert from '@/components/VAlert/VAlert'
+import VSpinner from '@/components/VSpinner/VSpinner'
+import VButton from '@/components/VButton/VButton'
 import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
-import VPage from '@/components/VPage/VPage.vue'
+import VPage from '@/components/VPage/VPage'
 
 @Component({
   components: { VPage, ChatFrame, VButton, VSpinner, VAlert },

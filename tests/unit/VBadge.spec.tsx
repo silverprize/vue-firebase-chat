@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
-import VBadge from '@/components/VBadge/VBadge.vue'
+import VBadge from '@/components/VBadge/VBadge'
 
-describe('VBadge.vue', () => {
+describe('VBadge', () => {
   it('레이블은 default slot으로 나타냄.', () => {
     const message = '레이블'
     const wrapper = mount(VBadge, {

@@ -41,7 +41,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import './DialogInvitation.scss'
-import VModal from '@/components/VModal/VModal.vue'
+import VModal from '@/components/VModal/VModal'
 
 @Component({
   components: { VModal },

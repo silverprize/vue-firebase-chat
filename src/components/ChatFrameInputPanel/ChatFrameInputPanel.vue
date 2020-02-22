@@ -36,8 +36,8 @@
 <script lang="ts">
 import { Component, Ref, Vue } from 'vue-property-decorator'
 import './ChatFrameInputPanel.scss'
-import VFile from '@/components/VFile/VFile.vue'
-import VButton from '@/components/VButton/VButton.vue'
+import VFile from '@/components/VFile/VFile'
+import VButton from '@/components/VButton/VButton'
 import { KeyCode } from '@/types'
 
 @Component({

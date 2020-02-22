@@ -37,7 +37,7 @@ import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../serv
 import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
 import DialogInvitation from '@/components/DialogInvitation/DialogInvitation.vue'
 import DialogConfirmInvitation from '@/components/DialogConfirmInvitation/DialogConfirmInvitation.vue'
-import VPage from '@/components/VPage/VPage.vue'
+import VPage from '@/components/VPage/VPage'
 import eventBus from '@/services/eventBus'
 import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import RouteName from '@/router/route.name'

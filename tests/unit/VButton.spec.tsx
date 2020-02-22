@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
-import VButton from '@/components/VButton/VButton.vue'
+import VButton from '@/components/VButton/VButton'
 
-describe('VButton.vue', () => {
+describe('VButton', () => {
   it('레이블은 default slot으로 나타냄.', () => {
     const label = '레이블'
     const wrapper = mount(VButton, {
