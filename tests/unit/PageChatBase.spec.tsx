@@ -1,5 +1,5 @@
 import { mount, MountOptions } from '@vue/test-utils'
-import PageChatBase from '@/views/chat-base/PageChatBase.vue'
+import PageChatBase from '@/views/chat-base/PageChatBase'
 import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol.js'
 import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
 import eventBus from '@/services/eventBus'
@@ -21,7 +21,7 @@ const baseMockStubs = {
   RouterView: '<div/>',
 }
 
-describe('PageChatBase.vue', () => {
+describe('PageChatBase.tsx', () => {
   beforeEach(() => {
     eventBus.$on = jest.fn()
     eventBus.$off = jest.fn()
@@ -45,9 +45,9 @@ describe('PageChatBase.vue', () => {
         RES_LEFT,
         RES_INVITED,
       ],
-      callback: (wrapper.vm as any).socketEventReceived,
+      callback: wrapper.vm.socketEventReceived,
     })
-    expect(eventBus.$on).toHaveBeenCalledWith(OPEN_INVITATION_DIALOG, (wrapper.vm as any).openInvitationDialog)
+    expect(eventBus.$on).toHaveBeenCalledWith(OPEN_INVITATION_DIALOG, wrapper.vm.openInvitationDialog)
   })
 
   it('PageChatBase 컴포넌트 인스턴스가 소멸하면 소켓이벤트와 eventBus 리스너 제거.', async () => {
@@ -64,9 +64,9 @@ describe('PageChatBase.vue', () => {
     }
     const wrapper = mount(PageChatBase, mockOptions)
     wrapper.vm.$destroy()
-    expect(removeSocketEventListener).toHaveBeenCalledWith((wrapper.vm as any).socketEventReceived)
+    expect(removeSocketEventListener).toHaveBeenCalledWith(wrapper.vm.socketEventReceived)
     await wrapper.vm.$nextTick()
-    expect(eventBus.$off).toHaveBeenCalledWith(OPEN_INVITATION_DIALOG, (wrapper.vm as any).openInvitationDialog)
+    expect(eventBus.$off).toHaveBeenCalledWith(OPEN_INVITATION_DIALOG, wrapper.vm.openInvitationDialog)
   })
 
   it('서버 연결이 끊기면 알림 다이얼로그 호출.', () => {
@@ -82,7 +82,7 @@ describe('PageChatBase.vue', () => {
       },
     }
     const wrapper = mount(PageChatBase, mockOptions)
-    ;(wrapper.vm as any).socketEventReceived(BUILTIN_DISCONNECT)
-    expect((wrapper.vm as any).dialogProps[Dialog.MESSAGE].visible).toBeTruthy()
+    wrapper.vm.socketEventReceived(BUILTIN_DISCONNECT, {})
+    expect(wrapper.vm.dialogProps[Dialog.MESSAGE].visible).toBeTruthy()
   })
 })

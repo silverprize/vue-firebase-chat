@@ -1,31 +1,3 @@
-<template>
-  <div class="chat-base">
-    <RouterView />
-    <DialogInvitation
-      v-if="dialogProps[Dialog.INVITATION].visible"
-      :people="dialogProps[Dialog.INVITATION].people"
-      @ok="inviteeSelected"
-      @close="closeDialog(Dialog.INVITATION)"
-    />
-    <DialogConfirmInvitation
-      v-if="dialogProps[Dialog.CONFIRM_INVITATION].visible"
-      :inviter="dialogProps[Dialog.CONFIRM_INVITATION].inviter"
-      :room="dialogProps[Dialog.CONFIRM_INVITATION].room"
-      @ok="invitationAccepted"
-      @close="invitationRejected"
-    />
-    <DialogMessage
-      v-if="dialogProps[Dialog.MESSAGE].visible"
-      :message-list="dialogProps[Dialog.MESSAGE].messageList"
-      :ok-label="dialogProps[Dialog.MESSAGE].okLabel"
-      :close-label="dialogProps[Dialog.MESSAGE].closeLabel"
-      @ok="messageRead"
-      @close="messageClosed"
-    />
-  </div>
-</template>
-
-<script lang="ts">
 import { Component } from 'vue-property-decorator'
 import { mixins } from 'vue-class-component'
 import { Action, Mutation } from 'vuex-class'
@@ -34,14 +6,12 @@ import './PageChatBase.scss'
 import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
 import { FETCH_ALL_PEOPLE, SEND_INVITATION, UPDATE_ROOM_LIST } from '@/store/chat/actions.type'
 import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol.js'
-import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
-import DialogInvitation from '@/components/DialogInvitation/DialogInvitation.vue'
-import DialogConfirmInvitation from '@/components/DialogConfirmInvitation/DialogConfirmInvitation.vue'
-import VPage from '@/components/VPage/VPage'
+import DialogInvitation from '@/components/DialogInvitation/DialogInvitation'
+import DialogConfirmInvitation from '@/components/DialogConfirmInvitation/DialogConfirmInvitation'
 import eventBus from '@/services/eventBus'
 import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import RouteName from '@/router/route.name'
-import DialogMessage from '@/components/DialogMessage/DialogMessage.vue'
+import DialogMessage from '@/components/DialogMessage/DialogMessage'
 import { REMOVE_SOCKET_EVENT_LISTENER, SET_SOCKET_EVENT_LISTENER } from '@/store/mutations.type'
 import { CLEAR } from '@/store/session/mutations.type'
 import { Dialog } from '@/types'
@@ -57,9 +27,7 @@ type MessageRequest = {
   closeLabel: string;
 }
 
-@Component({
-  components: { DialogMessage, VPage, DialogConfirmInvitation, DialogInvitation, ChatFrame },
-})
+@Component
 export default class PageChatBase extends mixins(GlobalSpinnerHandler) {
   dialogProps = {
     [Dialog.INVITATION]: {
@@ -82,8 +50,6 @@ export default class PageChatBase extends mixins(GlobalSpinnerHandler) {
       disconnected: false,
     },
   }
-
-  readonly Dialog = Dialog
 
   get isInLobby() {
     return this.$route.name === RouteName.ChatRoomList
@@ -249,5 +215,36 @@ export default class PageChatBase extends mixins(GlobalSpinnerHandler) {
   destroyed() {
     this.removeSocketEventListener(this.socketEventReceived)
   }
+
+  render() {
+    return (
+      <div class="chat-base">
+        <router-view />
+        {this.dialogProps[Dialog.INVITATION].visible &&
+          <DialogInvitation
+            people={this.dialogProps[Dialog.INVITATION].people}
+            onOk={this.inviteeSelected}
+            onClose={() => this.closeDialog(Dialog.INVITATION)}
+          />
+        }
+        {this.dialogProps[Dialog.CONFIRM_INVITATION].visible &&
+          <DialogConfirmInvitation
+            inviter={this.dialogProps[Dialog.CONFIRM_INVITATION].inviter}
+            room={this.dialogProps[Dialog.CONFIRM_INVITATION].room}
+            onOk={this.invitationAccepted}
+            onClose={this.invitationRejected}
+          />
+        }
+        {this.dialogProps[Dialog.MESSAGE].visible &&
+          <DialogMessage
+            messageList={this.dialogProps[Dialog.MESSAGE].messageList}
+            okLabel={this.dialogProps[Dialog.MESSAGE].okLabel}
+            closeLabel={this.dialogProps[Dialog.MESSAGE].closeLabel}
+            onOk={this.messageRead}
+            onClose={this.messageClosed}
+          />
+        }
+      </div>
+    )
+  }
 }
-</script>
