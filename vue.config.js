@@ -4,7 +4,7 @@ module.exports = {
     config.optimization
       .splitChunks({
         minSize: 10000,
-        maxSize: 100000,
+        maxSize: 200000,
       })
     config.module
       .rule('tsx')
