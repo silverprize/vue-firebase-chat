@@ -1,19 +1,23 @@
 import { Component, Ref } from 'vue-property-decorator'
 import * as tsx from 'vue-tsx-support'
 
+interface VFileProps {
+  accept?: string
+}
+
 interface VFileEvents {
-  onFileSelect: (fileList: File[]) => void
+  onSelectFile(fileList: File[]): void
 }
 
 @Component({
   inheritAttrs: false,
 })
-export default class VFile extends tsx.Component<{}, {}, VFileEvents> {
+export default class VFile extends tsx.Component<VFileProps, VFileEvents> {
   @Ref()
   private readonly fileElement!: HTMLInputElement
 
   private onChange() {
-    this.$emit('onSelectFile', this.fileElement.files)
+    this.$emit('selectFile', this.fileElement.files)
     this.reset()
   }
 

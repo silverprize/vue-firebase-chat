@@ -19,11 +19,7 @@ export default class VButton extends tsx.Component<VButtonProps, VButtonEvents> 
   }
 
   get styleVariant() {
-    const style = ['button']
-    if (this.variant) {
-      style.push(`button_${this.variant}`)
-    }
-    return style
+    return this.variant ? `button_${this.variant}` : ''
   }
 
   @Prop(String)
@@ -35,6 +31,7 @@ export default class VButton extends tsx.Component<VButtonProps, VButtonEvents> 
   render() {
     return (
       <button
+        staticClass="button"
         class={this.styleVariant}
         type={this.buttonType}
         on={this.$listeners}

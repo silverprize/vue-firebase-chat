@@ -1,7 +1,7 @@
-import { ElementAdditionalAttrs, ComponentAdditionalAttrs } from 'vue-tsx-support/types/base'
+import { ComponentAdditionalAttrs, ElementAdditionalAttrs } from 'vue-tsx-support/types/base'
 
 declare module 'vue-tsx-support/types/base' {
-  type VOn = {
+  interface VOn {
     on?: Record<string, Function | Function[]>
   }
 

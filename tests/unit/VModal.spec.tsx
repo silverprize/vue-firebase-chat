@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import VModal from '@/components/VModal/VModal'
 import VButton from '@/components/VButton/VButton'
 
-describe('VModel.vue', () => {
+describe('VModel', () => {
   it('default slot으로 VModal의 콘텐트를 채운다.', () => {
     const wrapper = mount(VModal, {
       scopedSlots: {

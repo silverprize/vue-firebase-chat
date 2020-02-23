@@ -11,9 +11,9 @@ import RouteName from '@/router/route.name'
 import VButton from '@/components/VButton/VButton'
 import VBadge from '@/components/VBadge/VBadge'
 import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
-import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
-import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader.vue'
-import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody.vue'
+import ChatFrame from '@/components/ChatFrame/ChatFrame'
+import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader'
+import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody'
 import { RouteEnterNext, RouteNext, RouterLinkSlotProps } from '@/types'
 
 @Component

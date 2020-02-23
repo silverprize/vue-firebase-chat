@@ -29,7 +29,7 @@ interface Message {
 }
 
 interface MessageParams {
-  content: string | FileList;
+  content: string | File[];
   contentType: MessageContentType;
   senderId: string;
 }

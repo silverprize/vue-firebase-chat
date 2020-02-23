@@ -1,60 +1,3 @@
-<template>
-  <ChatFrame>
-    <ChatFrameHeader class="chat-room__header">
-      <div class="chat-room__title">
-        <VBadge class="chat-room__title-badge">
-          👨‍👩‍👧‍👦 {{ countUsers }}
-        </VBadge>
-        <h4 class="chat-room__title-text">
-          {{ roomName }}
-        </h4>
-      </div>
-      <VButton
-        class="chat-room__leave-button"
-        variant="yellow"
-        @click="leave()"
-      >
-        나가기
-      </VButton>
-    </ChatFrameHeader>
-    <ChatFrameBody ref="talkBoxScrollElement">
-      <MessageList
-        ref="messageListComponent"
-        v-slot="{ message }"
-        :message-list="messageList"
-      >
-        <MessageListItemDiscriminator
-          :key="message.sequence"
-          :message="message"
-          :is-my-message="message.senderId === me"
-          @message-loaded="newMessageLoaded"
-        />
-      </MessageList>
-    </ChatFrameBody>
-    <ChatFrameInputPanel
-      ref="inputPanel"
-      @text-submitted="inputTextInformed"
-    >
-      <template v-slot:menu="{ focusInput }">
-        <VFile
-          class="chat-frame-input-panel__menu-item"
-          accept="image/*"
-          @onSelectFile="imageInformed($event, focusInput)"
-        >
-          사진 올리기
-        </VFile>
-        <VButton
-          class="chat-frame-input-panel__menu-item"
-          @click="openInvitationDialog"
-        >
-          초대
-        </VButton>
-      </template>
-    </ChatFrameInputPanel>
-  </ChatFrame>
-</template>
-
-<script lang="ts">
 import { Component, Ref } from 'vue-property-decorator'
 import { Action, Getter, Mutation } from 'vuex-class'
 import { Route } from 'vue-router'
@@ -63,38 +6,39 @@ import { mixins } from 'vue-class-component'
 import './PageChatRoom.scss'
 import { GET_ID } from '@/store/session/getters.type'
 import { GET_COUNT_PEOPLE, GET_MESSAGE_LIST, GET_ROOM_NAME } from '@/store/chat/getters.type'
-import { Message, MessageContentType, MessageParams, MessageType, RouteEnterNext, RouteNext } from '@/types'
+import {
+  Message,
+  MessageContentType,
+  MessageParams,
+  MessageType,
+  RouteEnterNext,
+  RouteNext,
+} from '@/types'
 import RouteName from '@/router/route.name'
 import VBadge from '@/components/VBadge/VBadge'
 import VButton from '@/components/VButton/VButton'
 import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
-import MessageList from '@/components/MessageList/MessageList.vue'
-import MessageListItemDiscriminator from '@/components/MessageListItemDiscriminator/MessageListItemDiscriminator.vue'
+import MessageList from '@/components/MessageList/MessageList'
+import MessageListItemDiscriminator
+  from '@/components/MessageListItemDiscriminator/MessageListItemDiscriminator'
 import VFile from '@/components/VFile/VFile'
-import ChatFrame from '@/components/ChatFrame/ChatFrame.vue'
-import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader.vue'
-import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody.vue'
-import ChatFrameInputPanel from '@/components/ChatFrameInputPanel/ChatFrameInputPanel.vue'
+import ChatFrame from '@/components/ChatFrame/ChatFrame'
+import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader'
+import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody'
+import ChatFrameInputPanel from '@/components/ChatFrameInputPanel/ChatFrameInputPanel'
 import eventBus from '@/services/eventBus'
 import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
-import { DISPATCH_MESSAGE, JOIN_ROOM, LEAVE_ROOM, UPDATE_ROOM_INFO } from '@/store/chat/actions.type'
+import {
+  DISPATCH_MESSAGE,
+  JOIN_ROOM,
+  LEAVE_ROOM,
+  UPDATE_ROOM_INFO,
+} from '@/store/chat/actions.type'
 import { ADD_MESSAGE, SET_IMAGE_URL } from '@/store/chat/mutations.type'
 import { RES_IMAGE_UPLOADED, RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol.js'
 import { REMOVE_SOCKET_EVENT_LISTENER, SET_SOCKET_EVENT_LISTENER } from '@/store/mutations.type'
 
-@Component({
-  components: {
-    ChatFrameInputPanel,
-    ChatFrameBody,
-    ChatFrameHeader,
-    ChatFrame,
-    MessageListItemDiscriminator,
-    MessageList,
-    VFile,
-    VButton,
-    VBadge,
-  },
-})
+@Component
 export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
   @Ref()
   readonly talkBoxScrollElement!: ChatFrameBody
@@ -157,7 +101,7 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
     this.sendTextMessage({ content: text, contentType: MessageContentType.Text })
   }
 
-  imageInformed(files: FileList, focusTextarea: () => void) {
+  imageInformed(files: File[], focusTextarea: () => void) {
     this.sendTextMessage({ content: files, contentType: MessageContentType.Image })
     focusTextarea()
   }
@@ -166,7 +110,7 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
     content,
     contentType,
   }: {
-    content: string | FileList;
+    content: string | File[];
     contentType: MessageContentType;
   }) {
     this.dispatchMessage({
@@ -249,5 +193,68 @@ export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
     }
     next()
   }
+
+  render() {
+    return (
+      <ChatFrame>
+        <ChatFrameHeader class="chat-room__header">
+          <div class="chat-room__title">
+            <VBadge class="chat-room__title-badge">
+              👨‍👩‍👧‍👦 {this.countUsers}
+            </VBadge>
+            <h4 class="chat-room__title-text">
+              {this.roomName}
+            </h4>
+          </div>
+          <VButton
+            class="chat-room__leave-button"
+            variant="yellow"
+            onClick={this.leave}
+          >
+            나가기
+          </VButton>
+        </ChatFrameHeader>
+        <ChatFrameBody ref="talkBoxScrollElement">
+          <MessageList
+            ref="messageListComponent"
+            messageList={this.messageList}
+            scopedSlots={{
+              default: ({ message }: { message: Message }) => (
+                <MessageListItemDiscriminator
+                  key={message.sequence}
+                  message={message}
+                  isMyMessage={message.senderId === this.me}
+                  onMessageLoaded={this.newMessageLoaded}
+                />
+              ),
+            }}
+          />
+        </ChatFrameBody>
+        <ChatFrameInputPanel
+          ref="inputPanel"
+          onTextSubmitted={this.inputTextInformed}
+          scopedSlots={{
+            menu: ({ focusInput }: { focusInput: () => void }) => (
+              [
+                <VFile
+                  class="chat-frame-input-panel__menu-item"
+                  accept="image/*"
+                  onSelectFile={$event => this.imageInformed($event, focusInput)}
+                >
+                  사진 올리기
+                </VFile>,
+                <VButton
+                  class="chat-frame-input-panel__menu-item"
+                  onClick={this.openInvitationDialog}
+                >
+                  초대
+                </VButton>,
+              ]
+            ),
+          }}
+        >
+        </ChatFrameInputPanel>
+      </ChatFrame>
+    )
+  }
 }
-</script>
