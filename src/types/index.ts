@@ -29,7 +29,7 @@ interface Message {
 }
 
 interface MessageParams {
-  content: string | FileList;
+  content: string | File[];
   contentType: MessageContentType;
   senderId: string;
 }
@@ -43,6 +43,11 @@ type RouteEnterNext<T> = (next: (vm: T) => any) => void
 
 type RouteNext = (next?: boolean) => void
 
+type RouterLinkSlotProps = {
+  href: string;
+  navigate: () => void
+}
+
 export {
   MessageType,
   MessageContentType,
@@ -53,4 +58,5 @@ export {
   Room,
   RouteEnterNext,
   RouteNext,
+  RouterLinkSlotProps,
 }

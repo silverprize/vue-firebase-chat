@@ -96,7 +96,7 @@ export default class Socket {
     return this.socket.disconnected
   }
 
-  upload(files: FileList, ...args: any[]) {
+  upload(files: File[], ...args: any[]) {
     this.uploader.upload(files, ...args)
   }
 
@@ -109,7 +109,7 @@ export default class Socket {
       } else {
         this.socket.once(REQ_MESSAGE, resolve)
         if (message.contentType === MessageContentType.Image) {
-          this.upload(message.content as FileList, {
+          this.upload(message.content as File[], {
             data: {
               ...message,
               content: '',
