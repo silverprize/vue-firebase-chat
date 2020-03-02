@@ -2,6 +2,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 
 import './MessageListItemUser.scss'
 import { Message, MessageContentType } from '@/types'
+import { formatDatetime } from '@/utils/formatDatetime'
 
 @Component
 export default class MessageListItemUser extends Vue {
@@ -37,7 +38,6 @@ export default class MessageListItemUser extends Vue {
   }
 
   render() {
-    const datetime = this.$options.filters!.datetime
     return (
       <div
         staticClass="message-list-item-user"
@@ -95,7 +95,7 @@ export default class MessageListItemUser extends Vue {
               <span
                 staticClass="message-list-item-user-balloon__datetime"
                 class={{ 'message-list-item-user-balloon__datetime_align_right': this.isMyMessage }}
-              >{datetime(this.message.sentAt)}</span>
+              >{formatDatetime(this.message.sentAt)}</span>
             </div>
           </div>
         </div>

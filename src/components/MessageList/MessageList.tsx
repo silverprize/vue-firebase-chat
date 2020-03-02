@@ -2,7 +2,6 @@ import * as tsx from 'vue-tsx-support'
 import { Component, Prop } from 'vue-property-decorator'
 import './MessageList.scss'
 import { Message } from '@/types'
-import { ScopedSlotReturnType } from 'vue-tsx-support/types/base'
 
 interface MessageListProps {
   messageList: Message[]
