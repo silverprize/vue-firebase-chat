@@ -22,7 +22,7 @@ describe('DialogConfirmInvitation', () => {
     const wrapper = mountDialogConfirmInvitation()
     wrapper.findAll('button').trigger('click')
 
-    expect(wrapper.emitted('ok').length).toBe(1)
-    expect(wrapper.emitted('close').length).toBe(1)
+    expect(wrapper.emitted('ok')!.length).toBe(1)
+    expect(wrapper.emitted('close')!.length).toBe(1)
   })
 })

@@ -25,7 +25,7 @@ describe('DialogInvitation', () => {
     wrapper.setData({ guest: 'a' })
     wrapper.findAll('button').trigger('click')
 
-    expect(wrapper.emitted('ok')[0][0]).toBe('a')
-    expect(wrapper.emitted('close').length).toBe(1)
+    expect(wrapper.emitted('ok')![0][0]).toBe('a')
+    expect(wrapper.emitted('close')!.length).toBe(1)
   })
 })
