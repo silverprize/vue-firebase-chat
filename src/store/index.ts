@@ -1,13 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import storeOptions from '@/store/options'
-import Socket from '@/services/socket'
+import rootModule from '@/store/root'
 
 Vue.use(Vuex)
 
-export interface RootState {
-  isBusy: boolean;
-  socket: Socket;
-}
-
-export default new Vuex.Store(storeOptions)
+export default new Vuex.Store(rootModule)

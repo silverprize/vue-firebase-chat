@@ -3,7 +3,7 @@ import { Component, Ref } from 'vue-property-decorator'
 import { Action, Mutation } from 'vuex-class'
 
 import './PageMain.scss'
-import { NEW_SOCKET } from '@/store/mutations.type'
+import { NEW_SOCKET } from '@/store/root/mutations.type'
 import { CONNECT } from '@/store/session/actions.type'
 import RouteName from '@/router/route.name'
 import VAlert from '@/components/VAlert/VAlert'

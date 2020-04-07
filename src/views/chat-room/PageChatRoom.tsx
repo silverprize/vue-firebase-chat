@@ -36,7 +36,10 @@ import {
 } from '@/store/chat/actions.type'
 import { ADD_MESSAGE, SET_IMAGE_URL } from '@/store/chat/mutations.type'
 import { RES_IMAGE_UPLOADED, RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol.js'
-import { REMOVE_SOCKET_EVENT_LISTENER, SET_SOCKET_EVENT_LISTENER } from '@/store/mutations.type'
+import {
+  REMOVE_SOCKET_EVENT_LISTENER,
+  SET_SOCKET_EVENT_LISTENER,
+} from '@/store/root/mutations.type'
 
 @Component
 export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {

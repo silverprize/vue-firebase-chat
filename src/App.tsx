@@ -2,7 +2,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import { Getter } from 'vuex-class'
 
 import '@/scss/index.scss'
-import { IS_BUSY } from '@/store/getters.type'
+import { IS_BUSY } from '@/store/root/getters.type'
 import VSpinner from '@/components/VSpinner/VSpinner'
 
 @Component

@@ -1,11 +1,9 @@
-import { cloneDeep } from 'lodash'
 import { createLocalVue, mount, ThisTypedMountOptions } from '@vue/test-utils'
 import PageChatRoom from '@/views/chat-room/PageChatRoom'
 import { RES_IMAGE_UPLOADED, RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol.js'
 import Vuex from 'vuex'
-import storeOptions from '@/store/options'
+import rootModule from '@/store/root'
 import RouteName from '@/router/route.name'
-import ChatFrameInputPanel from '@/components/ChatFrameInputPanel/ChatFrameInputPanel'
 import { MessageContentType } from '@/types'
 import eventBus from '@/services/eventBus'
 import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
@@ -22,7 +20,7 @@ const mountPageChatRoom = ({
   localVue.use(Vuex)
   return mount(PageChatRoom, {
     localVue,
-    store: new Vuex.Store(cloneDeep(storeOptions)),
+    store: new Vuex.Store(rootModule),
     methods: {
       setEnableSpinner: jest.fn(),
       ...methods,

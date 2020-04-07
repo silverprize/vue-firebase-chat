@@ -12,7 +12,10 @@ import eventBus from '@/services/eventBus'
 import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import RouteName from '@/router/route.name'
 import DialogMessage from '@/components/DialogMessage/DialogMessage'
-import { REMOVE_SOCKET_EVENT_LISTENER, SET_SOCKET_EVENT_LISTENER } from '@/store/mutations.type'
+import {
+  REMOVE_SOCKET_EVENT_LISTENER,
+  SET_SOCKET_EVENT_LISTENER,
+} from '@/store/root/mutations.type'
 import { CLEAR } from '@/store/session/mutations.type'
 import { Dialog } from '@/types'
 

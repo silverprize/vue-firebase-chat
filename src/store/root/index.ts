@@ -8,18 +8,22 @@ import {
   REMOVE_SOCKET_EVENT_LISTENER,
   SET_BUSY,
   SET_SOCKET_EVENT_LISTENER,
-} from '@/store/mutations.type'
-import { RootState } from '.'
+} from './mutations.type'
+
+interface RootState {
+  isBusy: boolean;
+  socket: Socket;
+}
 
 const storeOptions: StoreOptions<RootState> = {
   modules: {
     session,
     chat,
   },
-  state: {
+  state: () => ({
     isBusy: false,
     socket: new Socket(),
-  },
+  }),
   getters: {
     [GET_SOCKET]: state => state.socket,
     [IS_BUSY]: state => state.isBusy,
@@ -40,4 +44,7 @@ const storeOptions: StoreOptions<RootState> = {
   },
 }
 
+export {
+  RootState,
+}
 export default storeOptions

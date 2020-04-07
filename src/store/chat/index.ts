@@ -24,7 +24,7 @@ import {
   SEND_INVITATION,
 } from '@/store/chat/actions.type'
 import { FileInfo } from 'socket.io-file-client'
-import { RootState } from '@/store'
+import { RootState } from '@/store/root'
 
 interface State {
   roomList: [];
@@ -36,13 +36,13 @@ interface State {
 
 const dummyRoom = { name: '', countPeople: 0 }
 const chat: Module<State, RootState> = {
-  state: {
+  state: () => ({
     roomList: [],
     people: [],
     messageList: [],
     room: dummyRoom,
     imageMessageMap: {},
-  },
+  }),
   getters: {
     [GET_ROOM_LIST]: state => state.roomList,
     [GET_ROOM_NAME]: state => state.room.name,
