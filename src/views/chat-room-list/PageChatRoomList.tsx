@@ -1,7 +1,6 @@
 import { Action, Getter } from 'vuex-class'
-import { Component } from 'vue-property-decorator'
+import { Component, Mixins } from 'vue-property-decorator'
 import { Route } from 'vue-router'
-import { mixins } from 'vue-class-component'
 
 import './PageChatRoomList.scss'
 import { DISCONNECT } from '@/store/session/actions.type'
@@ -17,7 +16,7 @@ import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody'
 import { RouteEnterNext, RouteNext, RouterLinkSlotProps } from '@/types'
 
 @Component
-export default class PageChatRoomList extends mixins(GlobalSpinnerHandler) {
+export default class PageChatRoomList extends Mixins(GlobalSpinnerHandler) {
   @Getter(GET_ROOM_LIST)
   private readonly roomList!: []
 

@@ -1,5 +1,5 @@
 import { modifiers } from 'vue-tsx-support'
-import { Component, Ref } from 'vue-property-decorator'
+import { Component, Mixins, Ref } from 'vue-property-decorator'
 import { Action, Mutation } from 'vuex-class'
 
 import './PageMain.scss'
@@ -11,10 +11,9 @@ import VButton from '@/components/VButton/VButton'
 import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import VPage from '@/components/VPage/VPage'
 import logo from '@/assets/logo.png'
-import { mixins } from 'vue-class-component'
 
 @Component
-export default class PageMain extends mixins(GlobalSpinnerHandler) {
+export default class PageMain extends Mixins(GlobalSpinnerHandler) {
   @Ref()
   private readonly idElement!: HTMLElement
 

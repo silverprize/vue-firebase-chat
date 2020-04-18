@@ -1,7 +1,6 @@
-import { Component, Ref } from 'vue-property-decorator'
+import { Component, Mixins, Ref } from 'vue-property-decorator'
 import { Action, Getter, Mutation } from 'vuex-class'
 import { Route } from 'vue-router'
-import { mixins } from 'vue-class-component'
 
 import './PageChatRoom.scss'
 import { GET_ID } from '@/store/session/getters.type'
@@ -42,7 +41,7 @@ import {
 } from '@/store/root/mutations.type'
 
 @Component
-export default class PageChatRoom extends mixins(GlobalSpinnerHandler) {
+export default class PageChatRoom extends Mixins(GlobalSpinnerHandler) {
   @Ref()
   readonly talkBoxScrollElement!: ChatFrameBody
 

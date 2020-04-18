@@ -1,9 +1,9 @@
 import 'vue-tsx-support/enable-check'
 import Vue from 'vue'
+import { Component } from 'vue-property-decorator'
 import App from './App'
 import router from './router'
 import store from './store'
-import Component from 'vue-class-component'
 
 Vue.config.productionTip = false
 

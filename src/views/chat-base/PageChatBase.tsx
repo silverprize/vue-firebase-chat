@@ -1,5 +1,4 @@
-import { Component } from 'vue-property-decorator'
-import { mixins } from 'vue-class-component'
+import { Component, Mixins } from 'vue-property-decorator'
 import { Action, Mutation } from 'vuex-class'
 
 import './PageChatBase.scss'
@@ -31,7 +30,7 @@ type MessageRequest = {
 }
 
 @Component
-export default class PageChatBase extends mixins(GlobalSpinnerHandler) {
+export default class PageChatBase extends Mixins(GlobalSpinnerHandler) {
   dialogProps = {
     [Dialog.INVITATION]: {
       visible: false,
