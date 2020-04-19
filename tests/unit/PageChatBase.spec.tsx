@@ -1,10 +1,10 @@
 import { mount, MountOptions } from '@vue/test-utils'
 import PageChatBase from '@/views/chat-base/PageChatBase'
-import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol.js'
+import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol'
 import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
 import eventBus from '@/services/eventBus'
 import Vue from 'vue'
-import { Dialog } from '@/types'
+import { Dialog } from '@/types/common'
 
 jest.mock('@/services/eventBus', () => ({
   listen(this: any, vm: Vue, event: string, method: Function) {

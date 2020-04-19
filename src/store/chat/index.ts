@@ -13,7 +13,6 @@ import {
   GET_ROOM_LIST,
   GET_ROOM_NAME,
 } from '@/store/chat/getters.type'
-import { Message, MessageContentType, Room } from '@/types'
 import {
   DISPATCH_MESSAGE,
   FETCH_ALL_PEOPLE,
@@ -25,6 +24,7 @@ import {
 } from '@/store/chat/actions.type'
 import { FileInfo } from 'socket.io-file-client'
 import { RootState } from '@/store/root'
+import { Message, MessageContentType, Room } from '@/services/socket'
 
 interface State {
   roomList: [];

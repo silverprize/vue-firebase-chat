@@ -4,8 +4,8 @@ import { Component, Ref } from 'vue-property-decorator'
 
 import './ChatFrameInputPanel.scss'
 import VButton from '@/components/VButton/VButton'
-import { KeyCode } from '@/types'
 import { SyntheticEvent, TextareaHTMLAttributes } from 'vue-tsx-support/types/dom'
+import { KeyCode } from '@/types/common'
 
 interface ChatFrameInputPanelEvents {
   onTextSubmitted(text: string): void;

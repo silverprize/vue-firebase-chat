@@ -1,12 +1,12 @@
 import { createLocalVue, mount, ThisTypedMountOptions } from '@vue/test-utils'
 import PageChatRoom from '@/views/chat-room/PageChatRoom'
-import { RES_IMAGE_UPLOADED, RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol.js'
+import { RES_IMAGE_UPLOADED, RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol'
 import Vuex from 'vuex'
 import rootModule from '@/store/root'
 import RouteName from '@/router/route.name'
-import { MessageContentType } from '@/types'
 import eventBus from '@/services/eventBus'
 import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
+import { MessageContentType } from '@/services/socket'
 
 jest.mock('@/services/eventBus', () => ({
   send: jest.fn(),

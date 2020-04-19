@@ -9,8 +9,8 @@ import {
   REQ_REGISTER_ID,
   REQ_ROOM_INFO,
   REQ_ROOM_LIST,
-} from '@/../server/protocol.js'
-import { MessageContentType, MessageParams, Room } from '@/types'
+} from '@/../server/protocol'
+import { MessageContentType, MessageParams, Room } from '@/services/socket/types'
 
 interface ListenerInfo {
   event: string;
@@ -158,3 +158,5 @@ export default class Socket {
     })
   }
 }
+
+export * from './types'

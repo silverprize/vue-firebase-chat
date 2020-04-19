@@ -13,7 +13,7 @@ import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import ChatFrame from '@/components/ChatFrame/ChatFrame'
 import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader'
 import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody'
-import { RouteEnterNext, RouteNext, RouterLinkSlotProps } from '@/types'
+import { RouteEnterNext, RouteNext, RouterLinkSlotProps } from '@/types/common'
 
 @Component
 export default class PageChatRoomList extends Mixins(GlobalSpinnerHandler) {

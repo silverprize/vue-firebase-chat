@@ -5,14 +5,6 @@ import { Route } from 'vue-router'
 import './PageChatRoom.scss'
 import { GET_ID } from '@/store/session/getters.type'
 import { GET_COUNT_PEOPLE, GET_MESSAGE_LIST, GET_ROOM_NAME } from '@/store/chat/getters.type'
-import {
-  Message,
-  MessageContentType,
-  MessageParams,
-  MessageType,
-  RouteEnterNext,
-  RouteNext,
-} from '@/types'
 import RouteName from '@/router/route.name'
 import VBadge from '@/components/VBadge/VBadge'
 import VButton from '@/components/VButton/VButton'
@@ -34,11 +26,13 @@ import {
   UPDATE_ROOM_INFO,
 } from '@/store/chat/actions.type'
 import { ADD_MESSAGE, SET_IMAGE_URL } from '@/store/chat/mutations.type'
-import { RES_IMAGE_UPLOADED, RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol.js'
+import { RES_IMAGE_UPLOADED, RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol'
 import {
   REMOVE_SOCKET_EVENT_LISTENER,
   SET_SOCKET_EVENT_LISTENER,
 } from '@/store/root/mutations.type'
+import { Message, MessageContentType, MessageParams, MessageType } from '@/services/socket'
+import { RouteEnterNext, RouteNext } from '@/types/common'
 
 @Component
 export default class PageChatRoom extends Mixins(GlobalSpinnerHandler) {

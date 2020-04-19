@@ -1,9 +1,9 @@
 import * as tsx from 'vue-tsx-support'
 import { Component, Prop } from 'vue-property-decorator'
 
-import { Message, MessageType } from '@/types'
 import MessageListItemUser from '@/components/MessageListItemUser/MessageListItemUser'
 import MessageListItemSystem from '@/components/MessageListItemSystem/MessageListItemSystem'
+import { Message, MessageType } from '@/services/socket'
 
 interface MessageListItemDiscriminatorProps {
   message: Message;

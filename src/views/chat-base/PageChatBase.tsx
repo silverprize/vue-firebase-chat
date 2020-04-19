@@ -4,7 +4,7 @@ import { Action, Mutation } from 'vuex-class'
 import './PageChatBase.scss'
 import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
 import { FETCH_ALL_PEOPLE, SEND_INVITATION, UPDATE_ROOM_LIST } from '@/store/chat/actions.type'
-import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol.js'
+import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol'
 import DialogInvitation from '@/components/DialogInvitation/DialogInvitation'
 import DialogConfirmInvitation from '@/components/DialogConfirmInvitation/DialogConfirmInvitation'
 import eventBus from '@/services/eventBus'
@@ -16,7 +16,7 @@ import {
   SET_SOCKET_EVENT_LISTENER,
 } from '@/store/root/mutations.type'
 import { CLEAR } from '@/store/session/mutations.type'
-import { Dialog } from '@/types'
+import { Dialog } from '@/types/common'
 
 type InvitationRequest = {
   inviter: string;

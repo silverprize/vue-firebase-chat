@@ -1,6 +1,6 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import './MessageListItemSystem.scss'
-import { Message } from '@/types'
+import { Message } from '@/services/socket'
 
 @Component
 export default class MessageListItemSystem extends Vue {

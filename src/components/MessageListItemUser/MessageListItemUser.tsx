@@ -1,8 +1,8 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 import './MessageListItemUser.scss'
-import { Message, MessageContentType } from '@/types'
 import { formatDatetime } from '@/utils/datetimeFormatter'
+import { Message, MessageContentType } from '@/services/socket'
 
 @Component
 export default class MessageListItemUser extends Vue {
