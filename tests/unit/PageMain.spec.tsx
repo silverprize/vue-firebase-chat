@@ -8,10 +8,7 @@ const mountPageMain = ({
   methods = {},
 }: ThisTypedMountOptions<PageMain> = {}) => {
   return mount(PageMain, {
-    methods: {
-      setEnableSpinner: jest.fn(),
-      ...methods,
-    },
+    methods,
     mocks,
     data,
   })

@@ -1,5 +1,5 @@
 import { modifiers } from 'vue-tsx-support'
-import { Component, Mixins, Ref } from 'vue-property-decorator'
+import { Component, Ref, Vue } from 'vue-property-decorator'
 import { Action, Mutation } from 'vuex-class'
 
 import './PageMain.scss'
@@ -8,12 +8,12 @@ import { CONNECT } from '@/store/session/actions.type'
 import RouteName from '@/router/route.name'
 import VAlert from '@/components/VAlert/VAlert'
 import VButton from '@/components/VButton/VButton'
-import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import VPage from '@/components/VPage/VPage'
 import logo from '@/assets/logo.png'
+import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
 
 @Component
-export default class PageMain extends Mixins(GlobalSpinnerHandler) {
+export default class PageMain extends Vue {
   @Ref()
   private readonly idElement!: HTMLElement
 
@@ -30,8 +30,8 @@ export default class PageMain extends Mixins(GlobalSpinnerHandler) {
     return this.id.trim()
   }
 
+  @WithGlobalSpinner
   private async connect() {
-    this.startSpinner()
     try {
       await this.connectToServer(this.validId)
       this.$router.push({
@@ -41,7 +41,6 @@ export default class PageMain extends Mixins(GlobalSpinnerHandler) {
       this.newSocket()
       this.message = e.message
     }
-    this.stopSpinner()
   }
 
   mounted() {

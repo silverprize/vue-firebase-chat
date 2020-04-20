@@ -1,4 +1,4 @@
-import { Component, Mixins } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import { Action, Mutation } from 'vuex-class'
 
 import './PageChatBase.scss'
@@ -8,7 +8,6 @@ import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../serv
 import DialogInvitation from '@/components/DialogInvitation/DialogInvitation'
 import DialogConfirmInvitation from '@/components/DialogConfirmInvitation/DialogConfirmInvitation'
 import eventBus from '@/services/eventBus'
-import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import RouteName from '@/router/route.name'
 import DialogMessage from '@/components/DialogMessage/DialogMessage'
 import {
@@ -16,6 +15,7 @@ import {
   SET_SOCKET_EVENT_LISTENER,
 } from '@/store/root/mutations.type'
 import { CLEAR } from '@/store/session/mutations.type'
+import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
 import { Dialog } from '@/types/common'
 
 type InvitationRequest = {
@@ -30,7 +30,7 @@ type MessageRequest = {
 }
 
 @Component
-export default class PageChatBase extends Mixins(GlobalSpinnerHandler) {
+export default class PageChatBase extends Vue {
   dialogProps = {
     [Dialog.INVITATION]: {
       visible: false,
@@ -75,15 +75,14 @@ export default class PageChatBase extends Mixins(GlobalSpinnerHandler) {
   @Action(SEND_INVITATION)
   readonly sendInvitation!: (params: { chatId: string; room: string}) => Promise<void>
 
+  @WithGlobalSpinner
   async inviteeSelected(chatId: string) {
     const dialogProps = this.dialogProps[Dialog.INVITATION]
     this.closeDialog(Dialog.INVITATION)
-    this.startSpinner()
     await this.sendInvitation({
       chatId,
       room: dialogProps.room,
     })
-    this.stopSpinner()
   }
 
   invitationAccepted() {

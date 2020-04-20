@@ -1,5 +1,5 @@
 import { Action, Getter } from 'vuex-class'
-import { Component, Mixins } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import { Route } from 'vue-router'
 
 import './PageChatRoomList.scss'
@@ -9,14 +9,14 @@ import { UPDATE_ROOM_LIST } from '@/store/chat/actions.type'
 import RouteName from '@/router/route.name'
 import VButton from '@/components/VButton/VButton'
 import VBadge from '@/components/VBadge/VBadge'
-import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import ChatFrame from '@/components/ChatFrame/ChatFrame'
 import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader'
 import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody'
-import { RouteEnterNext, RouteNext, RouterLinkSlotProps } from '@/types/common'
+import { RouteNext, RouterLinkSlotProps } from '@/types/common'
+import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
 
 @Component
-export default class PageChatRoomList extends Mixins(GlobalSpinnerHandler) {
+export default class PageChatRoomList extends Vue {
   @Getter(GET_ROOM_LIST)
   private readonly roomList!: []
 
@@ -30,21 +30,17 @@ export default class PageChatRoomList extends Mixins(GlobalSpinnerHandler) {
     this.$router.replace({ name: RouteName.Main })
   }
 
-  async beforeRouteEnter(to: Route, from: Route, next: RouteEnterNext<PageChatRoomList>) {
-    next(async (vm) => {
-      vm.startSpinner()
-      await vm.updateRoomList()
-      vm.stopSpinner()
-    })
+  @WithGlobalSpinner
+  async created() {
+    await this.updateRoomList()
   }
 
   // 채팅방 목록을 나가는 경우는 두가지, 접속 페이지로 이동과 채팅방 입장.
   // 접속 페이지로 이동할땐 연결해제.
+  @WithGlobalSpinner
   async beforeRouteLeave(to: Route, from: Route, next: RouteNext) {
     if (to.name === RouteName.Main) {
-      this.startSpinner()
       await this.disconnect()
-      this.stopSpinner()
     }
     next()
   }

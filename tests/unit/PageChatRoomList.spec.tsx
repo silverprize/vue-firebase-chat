@@ -13,10 +13,13 @@ const mountPageRoomList = ({
   return mount(PageChatRoomList, {
     localVue,
     mocks,
-    computed,
+    computed: {
+      roomList: jest.fn(() => []),
+      ...computed,
+    },
     router,
     methods: {
-      setEnableSpinner: jest.fn(),
+      updateRoomList: jest.fn(),
       ...methods,
     },
   })
@@ -43,47 +46,26 @@ describe('PageChatRoomList.tsx', () => {
   })
 
   it('나가기 버튼 클릭.', () => {
-    const replace = jest.fn()
     const wrapper = mountPageRoomList({
       mocks: {
         $router: {
-          replace,
+          replace: jest.fn(),
         },
-      },
-      computed: {
-        roomList: () => ([]),
       },
     })
     wrapper.find('button').trigger('click')
-    expect(replace).toHaveBeenCalled()
+    expect(wrapper.vm.$router.replace).toHaveBeenCalled()
   })
 
   it('채팅방 목록 페이지 진입후 서버에 방목록 요청(updateRoomList).', async () => {
-    const updateRoomList = jest.fn()
-    const wrapper = mountPageRoomList({
-      computed: {
-        roomList: () => ([]),
-      },
-      methods: {
-        updateRoomList,
-      },
-    })
-    await wrapper.vm.beforeRouteEnter(
-      null as never,
-      null as never,
-      (callback: Function) => callback(wrapper.vm),
-    )
-    expect(updateRoomList).toHaveBeenCalled()
+    const wrapper = mountPageRoomList()
+    expect(wrapper.vm.$options!.methods!.updateRoomList).toHaveBeenCalled()
   })
 
   it('채팅방 목록에서 페이지에서 나가면 서버 연결 해제 호출(disconnect).', async () => {
-    const disconnect = jest.fn()
     const wrapper = mountPageRoomList({
-      computed: {
-        roomList: () => ([]),
-      },
       methods: {
-        disconnect,
+        disconnect: jest.fn(),
       },
     })
     await wrapper.vm.beforeRouteLeave(
@@ -91,19 +73,15 @@ describe('PageChatRoomList.tsx', () => {
       null as never,
       () => {},
     )
-    expect(disconnect).toHaveBeenCalled()
+    expect(wrapper.vm.$options!.methods!.disconnect).toHaveBeenCalled()
   })
 
   it('채팅방 목록에서 채팅방 선택하면 메소드로 채팅방 페이지로 이동($router.replace).', async () => {
-    const replace = jest.fn()
     const wrapper = mountPageRoomList({
       mocks: {
         $router: {
-          replace,
+          replace: jest.fn(),
         },
-      },
-      computed: {
-        roomList: () => ([]),
       },
     })
     await wrapper.vm.beforeRouteLeave(
@@ -112,6 +90,6 @@ describe('PageChatRoomList.tsx', () => {
       () => {},
     )
     wrapper.find('button').trigger('click')
-    expect(replace).toHaveBeenCalled()
+    expect(wrapper.vm.$router.replace).toHaveBeenCalled()
   })
 })

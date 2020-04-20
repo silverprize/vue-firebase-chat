@@ -1,4 +1,4 @@
-import { Component, Mixins, Ref } from 'vue-property-decorator'
+import { Component, Ref, Vue } from 'vue-property-decorator'
 import { Action, Getter, Mutation } from 'vuex-class'
 import { Route } from 'vue-router'
 
@@ -8,7 +8,6 @@ import { GET_COUNT_PEOPLE, GET_MESSAGE_LIST, GET_ROOM_NAME } from '@/store/chat/
 import RouteName from '@/router/route.name'
 import VBadge from '@/components/VBadge/VBadge'
 import VButton from '@/components/VButton/VButton'
-import GlobalSpinnerHandler from '@/mixins/GlobalSpinnerHandler'
 import MessageList from '@/components/MessageList/MessageList'
 import MessageListItemDiscriminator
   from '@/components/MessageListItemDiscriminator/MessageListItemDiscriminator'
@@ -31,11 +30,12 @@ import {
   REMOVE_SOCKET_EVENT_LISTENER,
   SET_SOCKET_EVENT_LISTENER,
 } from '@/store/root/mutations.type'
+import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
 import { Message, MessageContentType, MessageParams, MessageType } from '@/services/socket'
 import { RouteEnterNext, RouteNext } from '@/types/common'
 
 @Component
-export default class PageChatRoom extends Mixins(GlobalSpinnerHandler) {
+export default class PageChatRoom extends Vue {
   @Ref()
   readonly talkBoxScrollElement!: ChatFrameBody
 
@@ -116,8 +116,8 @@ export default class PageChatRoom extends Mixins(GlobalSpinnerHandler) {
     })
   }
 
+  @WithGlobalSpinner
   async joinRoom(room: string) {
-    this.startSpinner()
     this.setSocketEventListener({
       event: [
         RES_NEW_MESSAGE,
@@ -128,14 +128,12 @@ export default class PageChatRoom extends Mixins(GlobalSpinnerHandler) {
       callback: this.socketEventReceived,
     })
     await this.dispatchJoin(room)
-    this.stopSpinner()
   }
 
+  @WithGlobalSpinner
   async leaveRoom() {
-    this.startSpinner()
     this.removeSocketEventListener(this.socketEventReceived)
     await this.dispatchLeave()
-    this.stopSpinner()
   }
 
   async socketEventReceived(event: string, data: any) {

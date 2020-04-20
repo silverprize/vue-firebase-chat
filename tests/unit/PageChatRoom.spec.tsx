@@ -21,10 +21,7 @@ const mountPageChatRoom = ({
   return mount(PageChatRoom, {
     localVue,
     store: new Vuex.Store(rootModule),
-    methods: {
-      setEnableSpinner: jest.fn(),
-      ...methods,
-    },
+    methods,
     computed,
   })
 }
