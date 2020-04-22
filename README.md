@@ -25,7 +25,7 @@
 ## 프론트엔드
 
 - 소스코드 위치 : `<project root>/src`
-- Node.js 12.14.0
+- Node.js 12.x
 - Vue.js, scss, jest, socket.io-client
 - ESlint : Vue프리셋 & [standardJS](https://standardjs.com/)기반에 개인취향 반영
 - 컴포넌트 네이밍 : [Vue.js 공식 가이드](https://vuejs.org/v2/style-guide/#Priority-B-Rules-Strongly-Recommended-Improving-Readability)를 따름
@@ -35,7 +35,7 @@
 
 - 소스코드 위치 : `<project root>/server`
 - 이미지 저장 위치 : `<project root>/server/images`
-- Node.js 12.14.0
+- Node.js 12.x
 - socket.io
 
 # 빌드와 실행
