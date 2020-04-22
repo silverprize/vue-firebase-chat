@@ -16,15 +16,14 @@ import {
 import {
   DISPATCH_MESSAGE,
   FETCH_ALL_PEOPLE,
-  UPDATE_ROOM_INFO,
-  UPDATE_ROOM_LIST,
   JOIN_ROOM,
   LEAVE_ROOM,
   SEND_INVITATION,
+  UPDATE_ROOM_INFO,
+  UPDATE_ROOM_LIST,
 } from '@/store/chat/actions.type'
-import { FileInfo } from 'socket.io-file-client'
 import { RootState } from '@/store/root'
-import { Message, MessageContentType, Room } from '@/services/socket'
+import { FileInfo, Message, MessageContentType, Room } from '@/store/chat/types'
 
 interface State {
   roomList: [];
@@ -34,7 +33,7 @@ interface State {
   imageMessageMap: { [key: string]: Message };
 }
 
-const dummyRoom = { name: '', countPeople: 0 }
+const dummyRoom = { order: -1, name: '', countPeople: 0 }
 const chat: Module<State, RootState> = {
   state: () => ({
     roomList: [],
@@ -89,29 +88,22 @@ const chat: Module<State, RootState> = {
   },
   actions: {
     [UPDATE_ROOM_LIST]: async ({ rootState, commit }) => {
-      const roomList = await rootState.socket.fetchRoomList()
-      commit(SET_ROOM_LIST, roomList)
+      // TODO store migration
     },
     [UPDATE_ROOM_INFO]: async ({ rootState, commit }, room) => {
-      const roomInfo = await rootState.socket.fetchRoomInfo(room)
-      commit(SET_ROOM, roomInfo)
+      // TODO store migration
     },
     [FETCH_ALL_PEOPLE]: ({ rootState }) => {
-      return rootState.socket.fetchAllPeople()
     },
     [DISPATCH_MESSAGE]: async ({ rootState }, message) => {
-      await rootState.socket.dispatchMessage(message)
     },
     [JOIN_ROOM]: async ({ rootState, commit, dispatch }, room) => {
       commit(CLEAR)
-      await rootState.socket.join(room)
       await dispatch(UPDATE_ROOM_INFO, room)
     },
     [LEAVE_ROOM]: async ({ rootState }) => {
-      await rootState.socket.leave()
     },
     [SEND_INVITATION]: async ({ rootState }, { chatId, room }) => {
-      await rootState.socket.invite({ chatId, room })
     },
   },
 }

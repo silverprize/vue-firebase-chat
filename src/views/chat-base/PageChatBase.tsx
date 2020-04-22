@@ -4,16 +4,11 @@ import { Action, Mutation } from 'vuex-class'
 import './PageChatBase.scss'
 import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
 import { FETCH_ALL_PEOPLE, SEND_INVITATION, UPDATE_ROOM_LIST } from '@/store/chat/actions.type'
-import { BUILTIN_DISCONNECT, RES_INVITED, RES_JOINED, RES_LEFT } from '@/../server/protocol'
 import DialogInvitation from '@/components/DialogInvitation/DialogInvitation'
 import DialogConfirmInvitation from '@/components/DialogConfirmInvitation/DialogConfirmInvitation'
 import eventBus from '@/services/eventBus'
 import RouteName from '@/router/route.name'
 import DialogMessage from '@/components/DialogMessage/DialogMessage'
-import {
-  REMOVE_SOCKET_EVENT_LISTENER,
-  SET_SOCKET_EVENT_LISTENER,
-} from '@/store/root/mutations.type'
 import { CLEAR } from '@/store/session/mutations.type'
 import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
 import { Dialog } from '@/types/common'
@@ -56,12 +51,6 @@ export default class PageChatBase extends Vue {
   get isInLobby() {
     return this.$route.name === RouteName.ChatRoomList
   }
-
-  @Mutation(SET_SOCKET_EVENT_LISTENER)
-  readonly setSocketEventListener!: (params: { event: string[]; callback: Function }) => void
-
-  @Mutation(REMOVE_SOCKET_EVENT_LISTENER)
-  readonly removeSocketEventListener!: (callback: Function) => void
 
   @Mutation(CLEAR)
   readonly clearSession!: () => void
@@ -183,38 +172,8 @@ export default class PageChatBase extends Vue {
     this.dialogProps[dialog].visible = false
   }
 
-  async socketEventReceived(event: string, data: any) {
-    switch (event) {
-      case RES_JOINED:
-      case RES_LEFT:
-        if (this.isInLobby) {
-          await this.updateRoomList()
-        }
-        break
-      case RES_INVITED:
-        this.openConfirmInvitationDialog(data)
-        break
-      case BUILTIN_DISCONNECT:
-        this.openDisconnectAlertDialog()
-        break
-    }
-  }
-
   created() {
-    this.setSocketEventListener({
-      event: [
-        BUILTIN_DISCONNECT,
-        RES_JOINED,
-        RES_LEFT,
-        RES_INVITED,
-      ],
-      callback: this.socketEventReceived,
-    })
     eventBus.listen(this, OPEN_INVITATION_DIALOG, this.openInvitationDialog)
-  }
-
-  destroyed() {
-    this.removeSocketEventListener(this.socketEventReceived)
   }
 
   render() {

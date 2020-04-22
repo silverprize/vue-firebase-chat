@@ -35,6 +35,7 @@
     "tests/**/*.tsx"
   ],
   "exclude": [
+    "firebase",
     "node_modules"
   ]
 }

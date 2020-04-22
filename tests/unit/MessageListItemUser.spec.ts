@@ -1,6 +1,6 @@
 import MessageListItemUser from '@/components/MessageListItemUser/MessageListItemUser'
 import { mount } from '@vue/test-utils'
-import { MessageContentType } from '@/services/socket'
+import { MessageContentType } from '@/store/chat/types'
 
 describe('MessageListItemUser', () => {
   test('render message', () => {

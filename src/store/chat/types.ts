@@ -9,6 +9,7 @@ interface Message {
 }
 
 interface Room {
+  order: number;
   name: string;
   countPeople: number;
 }
@@ -17,6 +18,11 @@ interface MessageParams {
   content: string | File[];
   contentType: MessageContentType;
   senderId: string;
+}
+
+type FileInfo = {
+  uploadId: string
+  name: string
 }
 
 enum MessageType {
@@ -30,9 +36,10 @@ enum MessageContentType {
 }
 
 export {
+  Room,
+  FileInfo,
   Message,
   MessageParams,
-  Room,
   MessageContentType,
   MessageType,
 }

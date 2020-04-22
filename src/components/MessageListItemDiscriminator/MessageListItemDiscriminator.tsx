@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator'
 
 import MessageListItemUser from '@/components/MessageListItemUser/MessageListItemUser'
 import MessageListItemSystem from '@/components/MessageListItemSystem/MessageListItemSystem'
-import { Message, MessageType } from '@/services/socket'
+import { Message, MessageType } from '@/store/chat/types'
 
 interface MessageListItemDiscriminatorProps {
   message: Message;

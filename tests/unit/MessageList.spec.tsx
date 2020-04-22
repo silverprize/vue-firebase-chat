@@ -1,6 +1,6 @@
 import MessageList from '@/components/MessageList/MessageList'
 import { mount } from '@vue/test-utils'
-import { Message } from '@/services/socket'
+import { Message } from '@/store/chat/types'
 
 describe('MessageList', () => {
   test('props', () => {

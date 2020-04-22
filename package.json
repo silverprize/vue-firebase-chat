@@ -6,16 +6,12 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint",
-    "start": "node ./server/index.js",
-    "postinstall": "cd server && yarn"
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "core-js": "^3.6.4",
     "dayjs": "^1.8.19",
     "lodash": "^4.17.15",
-    "socket.io-client": "^2.3.0",
-    "socket.io-file-client": "^2.0.2",
     "vue": "^2.6.10",
     "vue-class-component": "^7.2.2",
     "vue-property-decorator": "^8.3.0",
@@ -27,7 +23,6 @@
   "devDependencies": {
     "@types/jest": "^25.1.1",
     "@types/lodash": "^4.14.149",
-    "@types/socket.io-client": "^1.4.32",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
     "@vue/cli-plugin-babel": "^4.1.0",

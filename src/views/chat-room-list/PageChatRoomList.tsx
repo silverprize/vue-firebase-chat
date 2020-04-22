@@ -14,11 +14,12 @@ import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader'
 import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody'
 import { RouteNext, RouterLinkSlotProps } from '@/types/common'
 import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
+import { Room } from '@/store/chat/types'
 
 @Component
 export default class PageChatRoomList extends Vue {
   @Getter(GET_ROOM_LIST)
-  private readonly roomList!: []
+  private readonly roomList!: Room[]
 
   @Action(UPDATE_ROOM_LIST)
   private readonly updateRoomList!: () => Promise<void>
@@ -33,6 +34,7 @@ export default class PageChatRoomList extends Vue {
   @WithGlobalSpinner
   async created() {
     await this.updateRoomList()
+    // this.$firebase.database().ref().push()
   }
 
   // 채팅방 목록을 나가는 경우는 두가지, 접속 페이지로 이동과 채팅방 입장.

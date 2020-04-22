@@ -1,7 +1,7 @@
 import { Module } from 'vuex'
 import { CLEAR, SET_ID } from './mutations.type'
 import { GET_ID, IS_CONNECTING } from './getters.type'
-import { CONNECT, DISCONNECT } from '@/store/session/actions.type'
+import { CHECK_SESSION, CONNECT, DISCONNECT } from '@/store/session/actions.type'
 import { RootState } from '@/store/root'
 
 interface State {
@@ -26,11 +26,11 @@ const module: Module<State, RootState> = {
   },
   actions: {
     [CONNECT]: async ({ rootState, commit }, id) => {
-      await rootState.socket.connect(id)
+      // TODO store migration
       commit(SET_ID, id)
     },
     [DISCONNECT]: async ({ rootState, commit }) => {
-      await rootState.socket.disconnect()
+      // TODO store migration
       commit(CLEAR)
     },
   },

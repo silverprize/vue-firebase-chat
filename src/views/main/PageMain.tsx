@@ -1,29 +1,29 @@
 import { modifiers } from 'vue-tsx-support'
 import { Component, Ref, Vue } from 'vue-property-decorator'
-import { Action, Mutation } from 'vuex-class'
 
 import './PageMain.scss'
-import { NEW_SOCKET } from '@/store/root/mutations.type'
-import { CONNECT } from '@/store/session/actions.type'
 import RouteName from '@/router/route.name'
 import VAlert from '@/components/VAlert/VAlert'
 import VButton from '@/components/VButton/VButton'
 import VPage from '@/components/VPage/VPage'
 import logo from '@/assets/logo.png'
 import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
+import { CHECK_SESSION, CONNECT } from '@/store/session/actions.type'
+import { Action } from 'vuex-class'
 
 @Component
 export default class PageMain extends Vue {
   @Ref()
   private readonly idElement!: HTMLElement
 
-  @Mutation(NEW_SOCKET)
-  private readonly newSocket!: () => void
-
   @Action(CONNECT)
-  private readonly connectToServer!: (id: string) => Promise<void>
+  private readonly connect!: (id: string) => Promise<void>
+
+  @Action(CHECK_SESSION)
+  private readonly checkSession!: () => Promise<void>
 
   private id = ''
+
   private message = ''
 
   private get validId() {
@@ -31,20 +31,29 @@ export default class PageMain extends Vue {
   }
 
   @WithGlobalSpinner
-  private async connect() {
+  private async handleSubmit() {
     try {
-      await this.connectToServer(this.validId)
-      this.$router.push({
-        name: RouteName.ChatRoomList,
-      })
+      await this.connect(this.validId)
+      this.goToLobby()
     } catch (e) {
-      this.newSocket()
       this.message = e.message
     }
   }
 
-  mounted() {
-    this.idElement.focus()
+  @WithGlobalSpinner
+  async mounted() {
+    try {
+      await this.checkSession()
+      this.goToLobby()
+    } catch {
+      this.idElement.focus()
+    }
+  }
+
+  goToLobby() {
+    this.$router.push({
+      name: RouteName.ChatRoomList,
+    })
   }
 
   render() {
@@ -62,7 +71,7 @@ export default class PageMain extends Vue {
         }
         <form
           class="main__form"
-          onSubmit={modifiers.prevent(this.connect)}
+          onSubmit={modifiers.prevent(this.handleSubmit)}
         >
           <div class="main__form-group">
             <label

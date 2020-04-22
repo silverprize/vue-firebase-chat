@@ -1,7 +1,7 @@
 import * as tsx from 'vue-tsx-support'
 import { Component, Prop } from 'vue-property-decorator'
 import './MessageList.scss'
-import { Message } from '@/services/socket'
+import { Message } from '@/store/chat/types'
 
 interface MessageListProps {
   messageList: Message[]

@@ -25,13 +25,8 @@ import {
   UPDATE_ROOM_INFO,
 } from '@/store/chat/actions.type'
 import { ADD_MESSAGE, SET_IMAGE_URL } from '@/store/chat/mutations.type'
-import { RES_IMAGE_UPLOADED, RES_JOINED, RES_LEFT, RES_NEW_MESSAGE } from '@/../server/protocol'
-import {
-  REMOVE_SOCKET_EVENT_LISTENER,
-  SET_SOCKET_EVENT_LISTENER,
-} from '@/store/root/mutations.type'
 import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
-import { Message, MessageContentType, MessageParams, MessageType } from '@/services/socket'
+import { Message, MessageContentType, MessageParams } from '@/store/chat/types'
 import { RouteEnterNext, RouteNext } from '@/types/common'
 
 @Component
@@ -62,12 +57,6 @@ export default class PageChatRoom extends Vue {
 
   @Mutation(SET_IMAGE_URL)
   readonly updateMessageImage!: (message: Message) => void
-
-  @Mutation(SET_SOCKET_EVENT_LISTENER)
-  readonly setSocketEventListener!: (params: { event: string[]; callback: Function }) => void
-
-  @Mutation(REMOVE_SOCKET_EVENT_LISTENER)
-  readonly removeSocketEventListener!: (callback: Function) => void
 
   @Action(JOIN_ROOM)
   readonly dispatchJoin!: (roomName: string) => Promise<void>
@@ -118,52 +107,12 @@ export default class PageChatRoom extends Vue {
 
   @WithGlobalSpinner
   async joinRoom(room: string) {
-    this.setSocketEventListener({
-      event: [
-        RES_NEW_MESSAGE,
-        RES_JOINED,
-        RES_LEFT,
-        RES_IMAGE_UPLOADED,
-      ],
-      callback: this.socketEventReceived,
-    })
     await this.dispatchJoin(room)
   }
 
   @WithGlobalSpinner
   async leaveRoom() {
-    this.removeSocketEventListener(this.socketEventReceived)
     await this.dispatchLeave()
-  }
-
-  async socketEventReceived(event: string, data: any) {
-    switch (event) {
-      case RES_NEW_MESSAGE:
-        this.addNewMessage({
-          ...data,
-          type: MessageType.User,
-        })
-        break
-      case RES_JOINED:
-        this.addNewMessage({
-          ...data,
-          type: MessageType.System,
-          content: `${data.chatId}님이 입장했습니다.`,
-        })
-        await this.updateRoomInfo(data.room)
-        break
-      case RES_LEFT:
-        this.addNewMessage({
-          ...data,
-          type: MessageType.System,
-          content: `${data.chatId}님이 떠났습니다.`,
-        })
-        await this.updateRoomInfo(data.room)
-        break
-      case RES_IMAGE_UPLOADED:
-        this.updateMessageImage(data)
-        break
-    }
   }
 
   mounted() {
@@ -176,7 +125,6 @@ export default class PageChatRoom extends Vue {
   }
 
   async beforeRouteUpdate(to: Route, from: Route, next: RouteNext) {
-    this.removeSocketEventListener(this.socketEventReceived)
     await this.joinRoom(to.params.room)
     next()
   }
