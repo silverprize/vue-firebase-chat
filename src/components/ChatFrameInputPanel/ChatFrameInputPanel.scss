@@ -37,6 +37,9 @@
       border: 0;
       padding: 15px 100px 15px 15px;
       resize: none;
+      &:disabled {
+        background-color: $grey-color;
+      }
     }
 
     &__send-button-container {

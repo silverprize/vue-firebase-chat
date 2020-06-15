@@ -1,10 +1,9 @@
-import { Component, Ref, Vue } from 'vue-property-decorator'
-import { Action, Getter, Mutation } from 'vuex-class'
+import { Component, Ref, Vue, Watch } from 'vue-property-decorator'
+import { Action, Getter } from 'vuex-class'
 import { Route } from 'vue-router'
 
 import './PageChatRoom.scss'
-import { GET_ID } from '@/store/session/getters.type'
-import { GET_COUNT_PEOPLE, GET_MESSAGE_LIST, GET_ROOM_NAME } from '@/store/chat/getters.type'
+import { GET_MESSAGES, GET_PEOPLE, GET_ROOM_INFO } from '@/store/chat/getters.type'
 import RouteName from '@/router/route.name'
 import VBadge from '@/components/VBadge/VBadge'
 import VButton from '@/components/VButton/VButton'
@@ -16,123 +15,176 @@ import ChatFrame from '@/components/ChatFrame/ChatFrame'
 import ChatFrameHeader from '@/components/ChatFrameHeader/ChatFrameHeader'
 import ChatFrameBody from '@/components/ChatFrameBody/ChatFrameBody'
 import ChatFrameInputPanel from '@/components/ChatFrameInputPanel/ChatFrameInputPanel'
-import eventBus from '@/services/eventBus'
-import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
 import {
   DISPATCH_MESSAGE,
-  JOIN_ROOM,
+  ENTER_ROOM,
   LEAVE_ROOM,
-  UPDATE_ROOM_INFO,
+  SEND_INVITATION,
 } from '@/store/chat/actions.type'
-import { ADD_MESSAGE, SET_IMAGE_URL } from '@/store/chat/mutations.type'
 import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
-import { Message, MessageContentType, MessageParams } from '@/store/chat/types'
 import { RouteEnterNext, RouteNext } from '@/types/common'
+import { GET_PROFILE } from '@/store/session/getters.type'
+import { ChatUser, Message, Profile, Room } from '@/services/backend'
+import { DialogRequestParams } from '@/store/dialog'
+import { DialogType, InvitationDialog } from '@/store/dialog/types'
+import ChatRoomPeoplePopup from '@/components/ChatRoomPeoplePopup/ChatRoomPeoplePopup'
+import { REQUEST_DIALOG } from '@/store/dialog/actions.type'
 
 @Component
 export default class PageChatRoom extends Vue {
   @Ref()
-  readonly talkBoxScrollElement!: ChatFrameBody
+  readonly chatFrameBody!: ChatFrameBody
 
   @Ref()
-  readonly messageListComponent!: MessageList
+  readonly messageList!: MessageList
 
   @Ref()
   readonly inputPanel!: ChatFrameInputPanel
 
-  @Getter(GET_ID)
-  readonly me!: string
+  @Getter(GET_PROFILE)
+  readonly profile!: Profile
 
-  @Getter(GET_ROOM_NAME)
-  readonly roomName!: string
+  @Getter(GET_ROOM_INFO)
+  readonly room!: Room
 
-  @Getter(GET_COUNT_PEOPLE)
-  readonly countUsers!: number
+  @Getter(GET_PEOPLE)
+  readonly people!: ChatUser[]
 
-  @Getter(GET_MESSAGE_LIST)
-  readonly messageList!: Message[]
+  @Getter(GET_MESSAGES)
+  readonly messages!: Message[]
 
-  @Mutation(ADD_MESSAGE)
-  readonly addNewMessage!: (message: Message) => void
-
-  @Mutation(SET_IMAGE_URL)
-  readonly updateMessageImage!: (message: Message) => void
-
-  @Action(JOIN_ROOM)
-  readonly dispatchJoin!: (roomName: string) => Promise<void>
+  @Action(ENTER_ROOM)
+  readonly enterRoom!: (roomId: string) => Promise<void>
 
   @Action(LEAVE_ROOM)
-  readonly dispatchLeave!: () => Promise<void>
+  readonly leaveRoom!: () => Promise<void>
 
   @Action(DISPATCH_MESSAGE)
-  readonly dispatchMessage!: (message: MessageParams) => Promise<void>
+  readonly dispatchMessage!: (message: Message.Params) => Promise<void>
 
-  @Action(UPDATE_ROOM_INFO)
-  readonly updateRoomInfo!: (room: string) => Promise<void>
+  @Action(SEND_INVITATION)
+  readonly sendInvitation!: (uid: string) => Promise<void>
 
-  leave() {
+  @Action(REQUEST_DIALOG)
+  readonly requestDialog!: (params: DialogRequestParams) => void
+
+  sendMessageQueue: Promise<void> = Promise.resolve()
+
+  isScrollAtEnd = true
+
+  peoplePopupShowed = false
+
+  handleLeaveClick() {
     this.$router.replace({ name: RouteName.ChatRoomList })
   }
 
-  openInvitationDialog() {
-    eventBus.send(OPEN_INVITATION_DIALOG, this.roomName)
-  }
-
-  newMessageLoaded() {
-    this.talkBoxScrollElement.$el.scrollTop = this.messageListComponent.$el.clientHeight - this.talkBoxScrollElement.$el.clientHeight
-  }
-
-  inputTextInformed(text: string) {
-    this.sendTextMessage({ content: text, contentType: MessageContentType.Text })
-  }
-
-  imageInformed(files: File[], focusTextarea: () => void) {
-    this.sendTextMessage({ content: files, contentType: MessageContentType.Image })
-    focusTextarea()
-  }
-
-  async sendTextMessage({
-    content,
-    contentType,
-  }: {
-    content: string | File[];
-    contentType: MessageContentType;
-  }) {
-    this.dispatchMessage({
-      content,
-      contentType,
-      senderId: this.me,
+  handleInvitationMenuClick() {
+    this.requestDialog({
+      dialogType: DialogType.INVITATION,
+      params: {
+        handleOk: this.handleSendInvitationOk,
+      } as InvitationDialog.Params,
     })
   }
 
   @WithGlobalSpinner
-  async joinRoom(room: string) {
-    await this.dispatchJoin(room)
+  handleSendInvitationOk(uid: string) {
+    return this.sendInvitation(uid)
+  }
+
+  handleNewMessageLoaded(message: Message) {
+    const isMyMessage = message.sender.id === this.profile.uid
+    if (isMyMessage || this.isScrollAtEnd) {
+      this.chatFrameBody.$el.scrollTop = this.messageList.$el.clientHeight - this.chatFrameBody.$el.clientHeight
+    }
+  }
+
+  handleTextSubmitted(text: string) {
+    this.sendMessage({ content: text, contentType: Message.ContentType.Text })
+  }
+
+  handleImageSubmitted(files: File[], focusTextarea: () => void) {
+    this.sendMessage({ content: files, contentType: Message.ContentType.Image })
+    focusTextarea()
+  }
+
+  sendMessage({
+    content,
+    contentType,
+  }: {
+    content: string | File[];
+    contentType: Message.ContentType;
+  }) {
+    this.sendMessageQueue = this.sendMessageQueue.then(() => this.dispatchMessage({
+      content,
+      contentType,
+    }))
+  }
+
+  handleChatFrameBodyScroll() {
+    const scrollElement = this.chatFrameBody.$el
+    const messageElement = this.messageList.$el
+    this.isScrollAtEnd = Math.abs((scrollElement.scrollTop + scrollElement.clientHeight) - messageElement.clientHeight) < 2
+  }
+
+  handlePeopleNumberClick() {
+    this.peoplePopupShowed = !this.peoplePopupShowed
+  }
+
+  @Watch('room')
+  async onRoomChanged(newRoom: Room) {
+    if (newRoom.id) {
+      await this.$nextTick()
+      this.inputPanel.focusInput()
+    }
   }
 
   @WithGlobalSpinner
-  async leaveRoom() {
-    await this.dispatchLeave()
+  beforeRouteEnter(to: Route, from: Route, next: RouteEnterNext<PageChatRoom>) {
+    return new Promise(resolve => {
+      next(async (vm) => {
+        try {
+          await vm.enterRoom(to.params.roomId)
+        } catch (e) {
+          vm.requestDialog({
+            dialogType: DialogType.MESSAGE,
+            params: {
+              message: '🚧 채팅방 연결중 오류가 발생했습니다.',
+              closeText: '',
+              okText: '채팅방 목록으로 이동',
+              handleOk: () => {
+                vm.$router.replace({ name: RouteName.ChatRoomList })
+              },
+            },
+          })
+        }
+        resolve()
+      })
+    })
   }
 
-  mounted() {
-    // @ts-ignore
-    this.inputPanel.focusInput()
-  }
-
-  async beforeRouteEnter(to: Route, from: Route, next: RouteEnterNext<PageChatRoom>) {
-    next((vm) => vm.joinRoom(to.params.room))
-  }
-
+  @WithGlobalSpinner
   async beforeRouteUpdate(to: Route, from: Route, next: RouteNext) {
-    await this.joinRoom(to.params.room)
-    next()
+    // 다른 채팅방으로 이동
+    try {
+      await this.leaveRoom()
+      await this.enterRoom(to.params.roomId)
+      next()
+    } catch {
+      this.requestDialog({
+        dialogType: DialogType.MESSAGE,
+        params: {
+          message: '🚧 채팅방 연결중 오류가 발생했습니다.',
+          closeText: '',
+          okText: '닫기',
+        },
+      })
+    }
   }
 
   async beforeRouteLeave(to: Route, from: Route, next: RouteNext) {
-    if (to.name !== RouteName.ChatRoom) {
-      await this.leaveRoom()
-    }
+    // 채팅방 목록으로 이동
+    this.leaveRoom()
     next()
   }
 
@@ -141,32 +193,37 @@ export default class PageChatRoom extends Vue {
       <ChatFrame>
         <ChatFrameHeader class="chat-room__header">
           <div class="chat-room__title">
-            <VBadge class="chat-room__title-badge">
-              👨‍👩‍👧‍👦 {this.countUsers}
-            </VBadge>
+            <div>
+              <VButton onClick={this.handlePeopleNumberClick}>
+                <VBadge class="chat-room__title-badge">
+                  💬 {this.people.length}
+                </VBadge>
+              </VButton>
+              {this.peoplePopupShowed && <ChatRoomPeoplePopup people={this.people} />}
+            </div>
             <h4 class="chat-room__title-text">
-              {this.roomName}
+              {this.room.name}
             </h4>
           </div>
           <VButton
             class="chat-room__leave-button"
             variant="yellow"
-            onClick={this.leave}
+            onClick={this.handleLeaveClick}
           >
             나가기
           </VButton>
         </ChatFrameHeader>
-        <ChatFrameBody ref="talkBoxScrollElement">
+        <ChatFrameBody ref="chatFrameBody" nativeOnScroll={this.handleChatFrameBodyScroll}>
           <MessageList
-            ref="messageListComponent"
-            messageList={this.messageList}
+            ref="messageList"
+            messageList={this.messages}
             scopedSlots={{
               default: ({ message }: { message: Message }) => (
                 <MessageListItemDiscriminator
-                  key={message.sequence}
+                  key={message.id}
                   message={message}
-                  isMyMessage={message.senderId === this.me}
-                  onMessageLoaded={this.newMessageLoaded}
+                  isMyMessage={message.sender.id === this.profile.uid}
+                  onMessageLoaded={this.handleNewMessageLoaded}
                 />
               ),
             }}
@@ -174,20 +231,23 @@ export default class PageChatRoom extends Vue {
         </ChatFrameBody>
         <ChatFrameInputPanel
           ref="inputPanel"
-          onTextSubmitted={this.inputTextInformed}
+          onTextSubmitted={this.handleTextSubmitted}
+          disabled={!this.room.id}
           scopedSlots={{
-            menu: ({ focusInput }: { focusInput: () => void }) => (
+            menus: ({ focusInput, disabled }: { focusInput: () => void, disabled: boolean }) => (
               [
                 <VFile
                   class="chat-frame-input-panel__menu-item"
                   accept="image/*"
-                  onSelectFile={$event => this.imageInformed($event, focusInput)}
+                  disabled={disabled}
+                  onSelectFile={$event => this.handleImageSubmitted($event, focusInput)}
                 >
                   사진 올리기
                 </VFile>,
                 <VButton
                   class="chat-frame-input-panel__menu-item"
-                  onClick={this.openInvitationDialog}
+                  disabled={disabled}
+                  onClick={this.handleInvitationMenuClick}
                 >
                   초대
                 </VButton>,

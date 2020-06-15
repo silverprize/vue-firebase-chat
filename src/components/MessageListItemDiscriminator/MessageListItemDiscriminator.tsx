@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator'
 
 import MessageListItemUser from '@/components/MessageListItemUser/MessageListItemUser'
 import MessageListItemSystem from '@/components/MessageListItemSystem/MessageListItemSystem'
-import { Message, MessageType } from '@/store/chat/types'
+import { Message } from '@/services/backend'
 
 interface MessageListItemDiscriminatorProps {
   message: Message;
@@ -11,7 +11,7 @@ interface MessageListItemDiscriminatorProps {
 }
 
 interface MessageListItemDiscriminatorEvents {
-  onMessageLoaded(): void
+  onMessageLoaded(message: Message): void
 }
 
 @Component
@@ -23,14 +23,17 @@ export default class MessageListItemDiscriminator extends tsx.Component<MessageL
   private readonly isMyMessage!: boolean
 
   private get isSystemMessage() {
-    return this.message.type === MessageType.System
+    return this.message.type === Message.Type.System
   }
 
   render() {
     const Component = this.isSystemMessage ? MessageListItemSystem : MessageListItemUser
     return (
       <Component
-        props={this.$props}
+        props={{
+          message: this.message,
+          isMyMessage: this.isMyMessage,
+        }}
         on={this.$listeners}
       />
     )

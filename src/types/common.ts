@@ -7,14 +7,12 @@ type RouterLinkSlotProps = {
   navigate: () => void
 }
 
-enum KeyCode {
-  Enter = 13,
+type Dictionary<T> = {
+  [key: string]: T
 }
 
-enum Dialog {
-  INVITATION,
-  CONFIRM_INVITATION,
-  MESSAGE,
+enum KeyCode {
+  Enter = 13,
 }
 
 export {
@@ -22,5 +20,5 @@ export {
   RouteNext,
   RouterLinkSlotProps,
   KeyCode,
-  Dialog,
+  Dictionary,
 }

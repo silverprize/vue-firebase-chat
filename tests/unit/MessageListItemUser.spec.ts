@@ -1,6 +1,6 @@
 import MessageListItemUser from '@/components/MessageListItemUser/MessageListItemUser'
 import { mount } from '@vue/test-utils'
-import { MessageContentType } from '@/store/chat/types'
+import { Message } from '@/services/backend'
 
 describe('MessageListItemUser', () => {
   test('render message', () => {
@@ -8,7 +8,7 @@ describe('MessageListItemUser', () => {
       propsData: {
         message: {
           content: 'a',
-          contentType: MessageContentType.Text,
+          contentType: Message.ContentType.Text,
         },
         isMyMessage: true,
       },
@@ -23,7 +23,7 @@ describe('MessageListItemUser', () => {
       propsData: {
         message: {
           content: 'a',
-          contentType: MessageContentType.Image,
+          contentType: Message.ContentType.Image,
           senderId: 'b',
         },
       },

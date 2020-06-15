@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "sessions": {
+      ".read": true,
+      "$uid": {
+        ".read": "auth.uid === $uid",
+        ".write": "auth.uid === $uid"
+      }
+    },
+    "invitations": {
+      "$uid": {
+        ".read": "auth.uid === $uid",
+        ".write": "auth.uid != null",
+        ".indexOn": "createdAt"
+      }
+    },
+    "chatRoomStates": {
+      ".read": "auth.uid != null",
+      ".write": "auth.uid != null",
+      "$roomId": {
+        ".read": "auth.uid != null",
+        ".write": "auth.uid != null",
+        ".indexOn": "order"
+      }
+    },
+    "chatRooms": {
+      ".read": "auth.uid != null",
+      ".write": "auth.uid != null",
+      "$roomId": {
+        ".read": "auth.uid != null",
+        ".write": "auth.uid != null",
+        "messages": {
+          ".indexOn": "createdAt"
+        },
+        "users": {
+          ".indexOn": "joinedAt"
+        }
+      }
+    }
+  }
+}

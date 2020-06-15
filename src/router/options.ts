@@ -1,11 +1,13 @@
 import { RouteConfig, RouterOptions } from 'vue-router'
 import main from '@/router/main'
-import chat from '@/router/chat-base'
+import chatRoom from '@/router/chat-room'
+import chatRoomList from '@/router/chat-room-list'
 import RouteName from '@/router/route.name'
 
 const routes: RouteConfig[] = [
   main,
-  chat,
+  chatRoomList,
+  chatRoom,
   {
     path: '*',
     redirect: { name: RouteName.Main },

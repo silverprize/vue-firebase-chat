@@ -1,52 +1,46 @@
 import { modifiers } from 'vue-tsx-support'
 import { Component, Ref, Vue } from 'vue-property-decorator'
+import { Action } from 'vuex-class'
 
 import './PageMain.scss'
 import RouteName from '@/router/route.name'
 import VAlert from '@/components/VAlert/VAlert'
 import VButton from '@/components/VButton/VButton'
 import VPage from '@/components/VPage/VPage'
-import logo from '@/assets/logo.png'
+import logo from '@/assets/hula_loop_octodex03.gif'
 import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
-import { CHECK_SESSION, CONNECT } from '@/store/session/actions.type'
-import { Action } from 'vuex-class'
+import { CHECK_USER_SESSION, SIGN_IN } from '@/store/session/actions.type'
+import { WithBlocking } from '@/decorators/WithBlocking'
+import { Session } from '@/services/backend'
 
 @Component
 export default class PageMain extends Vue {
   @Ref()
-  private readonly idElement!: HTMLElement
+  private readonly idElement!: HTMLInputElement
 
-  @Action(CONNECT)
-  private readonly connect!: (id: string) => Promise<void>
+  @Action(CHECK_USER_SESSION)
+  readonly checkUserSession!: () => Promise<Session>
 
-  @Action(CHECK_SESSION)
-  private readonly checkSession!: () => Promise<void>
+  @Action(SIGN_IN)
+  readonly signIn!: (name: string) => Promise<void>
 
-  private id = ''
+  private name = ''
 
   private message = ''
 
-  private get validId() {
-    return this.id.trim()
+  private get validName() {
+    return this.name.trim()
   }
 
+  @WithBlocking
   @WithGlobalSpinner
   private async handleSubmit() {
     try {
-      await this.connect(this.validId)
+      this.message = ''
+      await this.signIn(this.validName)
       this.goToLobby()
     } catch (e) {
       this.message = e.message
-    }
-  }
-
-  @WithGlobalSpinner
-  async mounted() {
-    try {
-      await this.checkSession()
-      this.goToLobby()
-    } catch {
-      this.idElement.focus()
     }
   }
 
@@ -56,9 +50,32 @@ export default class PageMain extends Vue {
     })
   }
 
+  @WithGlobalSpinner
+  async created() {
+    try {
+      const session = await this.checkUserSession()
+      if (session.currentRoomId) {
+        this.$router.push({
+          name: RouteName.ChatRoom,
+          params: { roomId: session.currentRoomId },
+        })
+      } else {
+        this.goToLobby()
+      }
+    } catch {
+      this.idElement.focus()
+    }
+  }
+
   render() {
     return (
       <VPage class="main">
+        <h1 class="main__title">
+          <a
+            href="https://github.com/silverprize/vue-firebase-chat"
+            target="_blank"
+          >vue-firebase-chat</a>
+        </h1>
         <img
           class="main__logo"
           src={logo}
@@ -78,12 +95,12 @@ export default class PageMain extends Vue {
               class="main__input-label"
               for="chatId"
             >
-              아이디
+              대화명
             </label>
             <input
               id="chatId"
               ref="idElement"
-              v-model={this.id}
+              v-model={this.name}
               class="main__input"
               type="text"
               placeholder="홍길동"
@@ -93,7 +110,7 @@ export default class PageMain extends Vue {
           <VButton
             type="submit"
             variant="brown"
-            disabled={!this.validId}
+            disabled={!this.validName}
           >
             접속
           </VButton>

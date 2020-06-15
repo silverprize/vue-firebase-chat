@@ -24,6 +24,10 @@
   box-shadow: $offsetx $offsetx $blur-radius $color;
 }
 
+@mixin text-shadow($offsetx: 0, $offsety: 1px, $blur-radius: 2px, $color: rgba($black-color, .3)) {
+  text-shadow: $offsetx $offsetx $blur-radius $color;
+}
+
 @mixin text-overflow() {
   overflow: hidden;
   text-overflow: ellipsis;

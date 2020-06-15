@@ -14,19 +14,16 @@ interface VButtonEvents {
 
 @Component
 export default class VButton extends tsx.Component<VButtonProps, VButtonEvents> {
+  @Prop(String)
+  readonly variant!: string
+
   get buttonType() {
-    return this.type || 'button'
+    return this.$attrs.type || 'button'
   }
 
   get styleVariant() {
     return this.variant ? `button_${this.variant}` : ''
   }
-
-  @Prop(String)
-  readonly variant!: string
-
-  @Prop(String)
-  readonly type!: string
 
   render() {
     return (

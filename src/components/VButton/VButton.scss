@@ -22,7 +22,7 @@
   text-align: center;
   padding: $half-spacer $spacer $half-spacer $spacer;
 
-  &[disabled] {
+  &:disabled {
     color: $grey-text-color;
     background-color: $grey-color;
     border-color: $default-border-color;

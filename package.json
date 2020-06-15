@@ -1,17 +1,20 @@
 {
-  "name": "vue-socket-io-chat",
-  "version": "1.0.1",
+  "name": "vue-firebase-chat",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "deploy": "cd firebase && firebase deploy"
   },
   "dependencies": {
     "core-js": "^3.6.4",
     "dayjs": "^1.8.19",
+    "firebase": "^7.8.1",
     "lodash": "^4.17.15",
+    "uuid": "^8.1.0",
     "vue": "^2.6.10",
     "vue-class-component": "^7.2.2",
     "vue-property-decorator": "^8.3.0",
@@ -21,8 +24,10 @@
     "vuex-class": "^0.3.2"
   },
   "devDependencies": {
-    "@types/jest": "^25.1.1",
+    "@types/jest": "^26.0.0",
     "@types/lodash": "^4.14.149",
+    "@types/uuid": "^8.0.0",
+    "@types/webpack-chain": "^5.2.0",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
     "@vue/cli-plugin-babel": "^4.1.0",
@@ -51,6 +56,6 @@
     "webpack": "^4.41.5"
   },
   "engines": {
-    "node": ">=12"
+    "node": "10"
   }
 }

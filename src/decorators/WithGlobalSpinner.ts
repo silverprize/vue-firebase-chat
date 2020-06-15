@@ -1,15 +1,27 @@
+import { createDecorator } from 'vue-class-component'
 import { Vue } from 'vue-property-decorator'
 import store from '@/store'
 import { SET_BUSY } from '@/store/root/mutations.type'
+import { ComponentOptions } from 'vue'
 
-export function WithGlobalSpinner(target: Vue, key: string, descriptor: TypedPropertyDescriptor<any>) {
-  const method: Function = descriptor.value
-  descriptor.value = async function (...args: any[]) {
+const factory = createDecorator((options: ComponentOptions<Vue>, prop: string) => {
+  const method = options.methods?.[prop] || (options as { [key: string]: any })[prop]
+  const container: any = options.methods?.[prop] ? options.methods : options
+
+  if (!method) {
+    throw new Error(`${prop} of ${method}`)
+  }
+
+  container[prop] = async function (this: Vue, ...args: any[]) {
     store.commit(SET_BUSY, true)
     try {
-      await method.apply(this, args)
+      return await method.apply(this, args)
     } finally {
       store.commit(SET_BUSY, false)
     }
   }
+})
+
+export function WithGlobalSpinner(target: Vue, key: string) {
+  factory(target, key)
 }

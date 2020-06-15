@@ -1,6 +1,10 @@
-# 스펙
+## Demo
 
-## 기능
+https://vue-firebase-chat-53f70.web.app
+
+# SPEC
+
+## Features
 
 - 페이지 구성
   - 로그인
@@ -11,123 +15,103 @@
 - 채팅방 목록 페이지
   - 채팅방 선택
   - 채팅방별 참여자수 실시간 표시
-  - 초대를 통해 방입장
+  - 초대를 통해 입장
 - 채팅방
   - 텍스트 메시지 전송
-  - 이미지 메시지 전송 (이미지 업로드중 채팅을 막지 않음)
+  - 이미지 메시지 전송 (이미지 업로드중 채팅 가능)
   - 다른 방에 있는 접속자 초대
   - 참여자수 실시간 표시
   - 메시지 시간 표시(서버 발송 시간 기준)
 - 공통
-  - 소켓연결이 끊기면 안내 메시지 출력, 사용자 컨펌후 로그인 페이지로 이동
-  - 페이지 새로고침하면 로그인 페이지로 리디렉트
+  - 서버 연결이 끊기면 안내 메시지 출력
+  - 페이지 새로고침하면 마지막에 참여중이었던 방으로 자동 입장 
 
-## 프론트엔드
+## Frontend
 
-- 소스코드 위치 : `<project root>/src`
-- Node.js 12.x
+- Node.js 10.x
 - Vue.js, scss, jest
-- ESlint : Vue프리셋 & [standardJS](https://standardjs.com/)기반에 개인취향 반영
-- 컴포넌트 네이밍 : [Vue.js 공식 가이드](https://vuejs.org/v2/style-guide/#Priority-B-Rules-Strongly-Recommended-Improving-Readability)를 따름
-- 디렉토리 & 파일 구조는 [vuetify 프레임워크](https://github.com/vuetifyjs/vuetify/tree/master/packages/vuetify/src/components) 벤치마킹
+- ESlint : vue-cli preset & customized [standardJS](https://standardjs.com/)
+- Component naming : [Vue.js Official](https://vuejs.org/v2/style-guide/#Priority-B-Rules-Strongly-Recommended-Improving-Readability)
+- Directory structure : [vuetify](https://github.com/vuetifyjs/vuetify/tree/master/packages/vuetify/src/components) style
 
-## 백엔드
+## Backend
 
-- firebase
+firebase spark plan
+- firebase-database
+  - 나중에 나온 firestore가 클라이언트에서 더 편리하게 사용할 수 있도록 정돈되어 있지만 [채팅 애플리케이션에 사용할 수 없는 특징](https://cloud.google.com/firestore/docs/best-practices#updates_to_a_single_document)이 있다.
+    - **한 document의 update 는 1초에 1번만 가능.**
+  - firestore를 사용하다 코드가 장황 해지는 로직, 클라이언트에 노출하지 않았으면 하는 코드를 functions를 사용하면 아주 간단하고 편리하게 처리 할 수 있다.
+    단, functions는 blaze플랜부터 사용 할 수 있다. firestore는 functions를 사용 할 수 밖에 없게 끔 하여 유료 플랜으로 끌어들이는 미끼처럼 느껴졌다.
+- firebase-storage
 
-# 빌드와 실행
+# Build & Deploy
 
-## 사전준비
+## Preparation
 
-Node.js 12 이상 설치
-
-## 빌드
-
-- 프론트엔드 output 위치 `<project root>/dist`
-- 백엔드 빌드 없음
-
-```sh
-npm i
-npm run build
+nvm
+```shell script
+brew install nvm
 ```
 
-## 실행
-
-- `<project root>/dist` 디렉토리가 웹서버 `document root`
-
-```sh
-npm i
-npm run build
-npm run start
+node 10
+```shell script
+nvm install 10
+nvm use 10
 ```
 
-http://localhost:3000 접속
-
-## 유닛테스트
-
-```sh
-npm i
-npm run test:unit
+yarn
+```shell script
+npm i -g yarn
 ```
 
-# 문제해결 전략
-
-## 메시지 순서 동기화
-
-클라이언트마다 메시지 표시 순서가 달라지는 것을 방지하기 위해 서버가 클라이언트로부터 받은 메시지에 서버에서 관리하는 시퀀스를 기록하고 클라이언트로 보낸다.  
-클라이언트에서 시퀀스를 기준으로 정렬한다.
-
-## 채팅방/채팅방 목록, 위치에 상관없이 초대
-
-뷰계층을 아래 구조로 구성하여 채팅방과 채팅방 목록을 상호 이동할떄,  
-placeholder 부분 뷰인스턴스만 생성/파괴되고 Parent뷰 인스턴스는 유지되게 한다.  
-Parent뷰가 초대 이벤트 리스너가 된다.
-
-```html
-<Parent>
-  <채팅방 or 채팅방 목록 컴포넌트 placeholder>
-  <ConfirmDialog />
-</Parent>
+firebase-tools
+```shell script
+yarn global add firebase-tools
+cd <project root>
+firebase login
+firebase use <your firebase project id>
 ```
 
-## async 이미지 업로드
+firebase configuration
+```shell script
+touch <project root>/firebase.config.json
+# firebase 설정값 추가
+```
 
-이미지 업로드 완료됨을 알리는 이벤트를 정의하고,  
-이미지라는 것만 알리는 메시지를 전송하여 클라이언트들에게 전파한다.  
-전파한 메시지를 서버가 수신 완료함을 확인한뒤 이미지를 업로드한다.  
-서버가 이미지 수신을 완료하면 수신 완료 이벤트를 통해 이미지url을 클라이언트들에게 알린다.  
-이미지 업로드 중인 동안 클라이언트들은 이미지 메시지 placeholder를 본다.
+## Build
 
-## 초대가 동시 다발적일때
+Output path : `<project root>/dist`
+```shell script
+cd <project root>
+yarn build
+```
 
-클라이언트는 초대 다이얼로를 보고 있는 동안 초대 다이얼로그를 더 띄우지 않는다.  
-초대 저장 큐를 두고 초대 다이얼로그가 띄워졌을땐 초대정보를 큐에 저장한다.  
-초대 다이얼로그를 닫으면 큐에서 하나씩 밀어내며 초대 다이얼로그를 띄우는 과정을 반복한다.
+## Deploy
 
-## 채팅방 참여자수 실시간 표시
+```shell script
+cd <project root>
+yarn deploy
+```
 
-서버로부터 다른 클라이언트의 입장/퇴장 이벤트를 받아,  
-현재 페이지에 따라 필요한 데이터를 요청/수신하여 반영한다.
+firebase specific
+```shell script
+yarn deploy --only <database|storage|hosting>
+```
 
-## 클라이언트 아이디 유지/참여한 채팅방 식별/접속 현황 관리
+# Development
 
-socket.io를 특성을 통해 쉽게 구현할 수 있다.  
-서버에서 클라이언트 socket은 끊기기 전까지 인스턴스가 유지된다.  
-클라이언트 소켓에 아이디와 참여중인 채팅방을 저장한다.  
-아래 자료구조로 연결과 끊김에 관련된 이벤트에 따라 업데이트.
+## Start
 
-```javascript
-{
-  people: {
-    loginId: socket_instance
-  },
-  chatRooms: {
-    Moon: {
-      name: 'Moon',
-      countPeople: 0,
-    },
-    ...
-  },
-  countTotalPeople: 0
-}
+```shell script
+cd <project root>/firebase
+firebase deploy --except hosting
+cd <project root>
+yarn serve
+```
+
+## Unit test
+
+```shell script
+cd <project root>
+yarn test:unit
 ```

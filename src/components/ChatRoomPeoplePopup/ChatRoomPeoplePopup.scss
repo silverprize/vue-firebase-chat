@@ -1,0 +1,46 @@
+@import '../../scss/variables';
+@import '../../scss/mixins';
+
+.chat-room-popup {
+  position: absolute;
+
+  &__arrow {
+    display: flex;
+    margin-left: 2rem;
+    height: .5rem;
+    width: .5rem;
+
+    &:before {
+      position: absolute;
+      content: '';
+      border-style: solid;
+      border-color: transparent transparent $grey-border-color transparent;
+      border-width: 0 .25rem .5rem .25rem;
+    }
+    &:after {
+      position: absolute;
+      top: 2px;
+      content: '';
+      border-style: solid;
+      border-color: transparent transparent white transparent;
+      border-width: 0 .25rem .5rem .25rem;
+    }
+  }
+
+  &__body {
+    text-align: left;
+    margin: 0;
+    max-height: calc(100vh - 210px);
+    min-width: 100px;
+    padding: $half-spacer;
+    background: $light-color;
+    border: 1px solid $grey-border-color;
+    border-radius: $default-border-radius;
+    overflow: auto;
+    @include box-shadow(2px, 2px, 6px);
+  }
+
+  &__user-name {
+    padding: $half-spacer / 2;
+  }
+}

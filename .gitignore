@@ -1,9 +1,12 @@
 .DS_Store
 node_modules
 /dist
-/server/images
+/firebase/dist
+/firebase/.firebase
+/firebase/.firebaserc
 
 # local env files
+firebase.config.json
 .env.local
 .env.*.local
 
@@ -11,6 +14,8 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+firebase-debug.log*
+database-debug.log*
 
 # Editor directories and files
 .idea

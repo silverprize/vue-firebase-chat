@@ -1,9 +1,7 @@
 import { Component, Ref } from 'vue-property-decorator'
 import * as tsx from 'vue-tsx-support'
 
-interface VFileProps {
-  accept?: string
-}
+import './VFile.scss'
 
 interface VFileEvents {
   onSelectFile(fileList: File[]): void
@@ -12,12 +10,12 @@ interface VFileEvents {
 @Component({
   inheritAttrs: false,
 })
-export default class VFile extends tsx.Component<VFileProps, VFileEvents> {
+export default class VFile extends tsx.Component<{}, VFileEvents> {
   @Ref()
   private readonly fileElement!: HTMLInputElement
 
   private onChange() {
-    this.$emit('selectFile', this.fileElement.files)
+    this.$emit('selectFile', [].slice.apply(this.fileElement.files))
     this.reset()
   }
 
@@ -27,10 +25,10 @@ export default class VFile extends tsx.Component<VFileProps, VFileEvents> {
 
   render() {
     return (
-      <label>
+      <label staticClass="file" class={{ disabled: this.$attrs.disabled }}>
         {this.$slots.default}
         <input
-          {...this.$attrs}
+          attrs={this.$attrs}
           ref="fileElement"
           type="file"
           hidden

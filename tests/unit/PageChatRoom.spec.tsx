@@ -2,14 +2,7 @@ import { createLocalVue, mount, ThisTypedMountOptions } from '@vue/test-utils'
 import PageChatRoom from '@/views/chat-room/PageChatRoom'
 import Vuex from 'vuex'
 import rootModule from '@/store/root'
-import RouteName from '@/router/route.name'
-import eventBus from '@/services/eventBus'
-import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
-import { MessageContentType } from '@/store/chat/types'
-
-jest.mock('@/services/eventBus', () => ({
-  send: jest.fn(),
-}))
+import { Message } from '@/services/backend'
 
 const mountPageChatRoom = ({
   methods = {},
@@ -85,7 +78,7 @@ describe('PageChatRoom', () => {
     }
     const getExpectMessage = (content: string) => ({
       content,
-      contentType: MessageContentType.Text,
+      contentType: Message.ContentType.Text,
       senderId: '',
     })
 
@@ -112,6 +105,6 @@ describe('PageChatRoom', () => {
 
     wrapper.findAll('.chat-frame-input-panel__menu-item').at(1).trigger('click')
 
-    expect(eventBus.send).toHaveBeenCalledWith(OPEN_INVITATION_DIALOG, room)
+    // expect(eventBus.send).toHaveBeenCalledWith(OPEN_INVITATION_DIALOG, room)
   })
 })

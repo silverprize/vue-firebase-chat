@@ -3,34 +3,43 @@ import { Component, Prop } from 'vue-property-decorator'
 
 import './DialogInvitation.scss'
 import VModal from '@/components/VModal/VModal'
+import { ChatUser } from '@/services/backend'
+import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
+import { InvitationDialog } from '@/store/dialog/types'
 
-interface DialogInvitationProps {
-  people?: string[]
+interface Props {
+  params: InvitationDialog.Params;
 }
 
-interface DialogInvitationEvents {
-  onOk(chatId: string): void
+interface Events {
+  onOk(uid: string): void
   onClose(): void
 }
 
 @Component({
   components: { VModal },
 })
-export default class DialogInvitation extends tsx.Component<DialogInvitationProps, DialogInvitationEvents> {
-  @Prop({ type: Array, default: () => ([]) })
-  private readonly people!: string[]
+export default class DialogInvitation extends tsx.Component<Props, Events> {
+  @Prop(Object)
+  private readonly params!: InvitationDialog.Params
 
-  private guest = ''
+  private users: ChatUser[] | null = null
 
-  private onOk() {
+  private guest: string = ''
+
+  @WithGlobalSpinner
+  private async onOk() {
     if (this.guest) {
       this.$emit('ok', this.guest)
     }
   }
 
-  created() {
-    if (this.people.length) {
-      this.guest = this.people[0]
+  @WithGlobalSpinner
+  async mounted() {
+    const users = await this.params.usersPromise
+    this.users = users || []
+    if (this.users.length) {
+      this.guest = this.users[0].id
     }
   }
 
@@ -54,25 +63,23 @@ export default class DialogInvitation extends tsx.Component<DialogInvitationProp
             value={this.guest}
             class="dialog-select-user"
           >
-            {this.people.length > 0
-              ? (
-                this.people.map(chatId => (
-                  <option
-                    key={chatId}
-                    value={chatId}
-                  >
-                    {chatId}
-                  </option>
-                ))
-              )
-              : (
+            {this.users?.length &&
+              this.users.map(chatUser => (
+                <option
+                  key={chatUser.id}
+                  value={chatUser.id}
+                >
+                  {chatUser.name}
+                </option>
+              ))
+            }
+            {this.users && !this.users.length &&
                 <option
                   disabled
                   value=""
                 >
                   초대할 사람이 없습니다.
                 </option>
-              )
             }
           </select>
         </div>

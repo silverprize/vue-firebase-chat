@@ -1,9 +1,4 @@
-import { mount, MountOptions } from '@vue/test-utils'
-import PageChatBase from '@/views/chat-base/PageChatBase'
-import { OPEN_INVITATION_DIALOG } from '@/services/eventBus/event.name'
-import eventBus from '@/services/eventBus'
 import Vue from 'vue'
-import { Dialog } from '@/types/common'
 
 jest.mock('@/services/eventBus', () => ({
   listen(this: any, vm: Vue, event: string, method: Function) {
@@ -16,16 +11,11 @@ jest.mock('@/services/eventBus', () => ({
   $off: jest.fn(),
 }))
 
-const baseMockStubs = {
-  RouterView: '<div/>',
-}
+// const baseMockStubs = {
+//   RouterView: '<div/>',
+// }
 
-describe('PageChatBase.tsx', () => {
-  beforeEach(() => {
-    eventBus.$on = jest.fn()
-    eventBus.$off = jest.fn()
-  })
-
+describe('DialogContainer.tsx', () => {
   // TODO unit test migration
   // it('PageChatBase 컴포넌트 인스턴스가 만들어지면 소켓이벤트(입장/퇴장/초대/연결끊김)와 eventBus이벤트(초대 열기) 리스너 등록.', () => {
   //   const setSocketEventListener = jest.fn()

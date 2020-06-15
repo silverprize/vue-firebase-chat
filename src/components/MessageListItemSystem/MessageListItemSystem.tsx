@@ -1,6 +1,6 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import './MessageListItemSystem.scss'
-import { Message } from '@/store/chat/types'
+import { Message } from '@/services/backend'
 
 @Component
 export default class MessageListItemSystem extends Vue {
@@ -8,7 +8,7 @@ export default class MessageListItemSystem extends Vue {
   private readonly message!: Message
 
   mounted() {
-    this.$emit('messageLoaded')
+    this.$emit('messageLoaded', this.message)
   }
 
   render() {

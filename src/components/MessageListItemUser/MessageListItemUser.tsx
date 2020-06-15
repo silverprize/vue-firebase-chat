@@ -2,7 +2,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 
 import './MessageListItemUser.scss'
 import { formatDatetime } from '@/utils/datetimeFormatter'
-import { Message, MessageContentType } from '@/store/chat/types'
+import { Message } from '@/services/backend'
 
 @Component
 export default class MessageListItemUser extends Vue {
@@ -12,29 +12,38 @@ export default class MessageListItemUser extends Vue {
   @Prop(Boolean)
   private readonly isMyMessage!: boolean
 
-  private isContentLoaded = false
+  private imageLoaded = false
+
+  private imageErrored = false
 
   private get senderInitial() {
-    return this.message.senderId[0]
+    return this.message.sender.name[0]
   }
 
   private get isText() {
-    return this.message.contentType === MessageContentType.Text
+    return this.message.contentType === Message.ContentType.Text
   }
 
   private get isImage() {
-    return this.message.contentType === MessageContentType.Image
+    return this.message.contentType === Message.ContentType.Image
   }
 
-  private contentLoaded() {
-    this.isContentLoaded = true
-    this.$emit('messageLoaded')
+  private get content() {
+    return this.message.content || null as any
+  }
+
+  private handleImageLoaded() {
+    this.imageLoaded = true
+    this.$emit('messageLoaded', this.message)
+  }
+
+  private handleImageError() {
+    this.imageErrored = true
+    this.handleImageLoaded()
   }
 
   mounted() {
-    if (this.isText) {
-      this.contentLoaded()
-    }
+    this.$emit('messageLoaded', this.message)
   }
 
   render() {
@@ -54,7 +63,7 @@ export default class MessageListItemUser extends Vue {
         >
           {!this.isMyMessage &&
           <div class="message-list-item-user-sender">
-            {this.message.senderId}
+            {this.message.sender.name}
           </div>
           }
           <div
@@ -75,16 +84,19 @@ export default class MessageListItemUser extends Vue {
               ) || (
                 this.isImage &&
                 <div class="message-list-item-user-balloon__content-image-wrapper">
-                  <img
-                    class="message-list-item-user-balloon__content-image"
-                    src={this.message.content || null as any}
-                    alt=""
-                    on={{
-                      '~load': this.contentLoaded,
-                      '~error': this.contentLoaded,
-                    }}
-                  />
-                  {!this.isContentLoaded &&
+                  {!this.imageErrored
+                    ? <img
+                      class="message-list-item-user-balloon__content-image"
+                      src={this.content}
+                      alt=""
+                      on={{
+                        '~load': this.handleImageLoaded,
+                        '~error': this.handleImageError,
+                      }}
+                    />
+                    : '이미지 불러오기 실패'
+                  }
+                  {!this.imageLoaded &&
                   <div
                     staticClass="absolute spinner"
                     class={{ spinner_color_light: this.isMyMessage }}
@@ -95,7 +107,7 @@ export default class MessageListItemUser extends Vue {
               <span
                 staticClass="message-list-item-user-balloon__datetime"
                 class={{ 'message-list-item-user-balloon__datetime_align_right': this.isMyMessage }}
-              >{formatDatetime(this.message.sentAt)}</span>
+              >{formatDatetime(this.message.createdAt)}</span>
             </div>
           </div>
         </div>

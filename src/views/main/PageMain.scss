@@ -5,6 +5,16 @@
   @include flex(column, center, center);
   position: relative;
 
+  &__title {
+    @include flex(column, null, center);
+    flex-grow: 1;
+    margin: 0;
+    a {
+      color: $light-brown-color;
+      @include text-shadow(1px, 1px, 1px);
+    }
+  }
+
   &__logo {
     border-radius: $default-border-radius;
     margin-bottom: $spacer * 2;
@@ -14,7 +24,8 @@
 
   &__form {
     @include flex(column);
-    margin-top: $spacer * 2;
+    flex-grow: 1;
+    margin-top: $spacer;
 
     &-group {
       margin-bottom: $half-spacer;
@@ -23,7 +34,7 @@
 
   &__message {
     position: absolute;
-    margin-top: 0.75rem;
+    margin-top: $spacer * 3;
   }
 
   &__input {

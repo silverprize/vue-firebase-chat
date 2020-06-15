@@ -1,4 +1,3 @@
-import 'vue-tsx-support/enable-check'
 import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import App from './App'
@@ -12,6 +11,8 @@ Component.registerHooks([
   'beforeRouteUpdate',
   'beforeRouteLeave',
 ])
+
+router.onError((err) => console.warn(err))
 
 new Vue({
   router,

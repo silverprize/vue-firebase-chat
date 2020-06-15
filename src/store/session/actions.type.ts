@@ -1,3 +1,3 @@
-export const CONNECT = 'session.connect'
-export const DISCONNECT = 'session.disconnect'
-export const CHECK_SESSION = 'session.checkSession'
+export const SIGN_IN = 'session.signIn'
+export const SIGN_OUT = 'session.signOut'
+export const CHECK_USER_SESSION = 'root.checkUserSession'

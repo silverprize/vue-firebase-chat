@@ -5,7 +5,7 @@ import 'dayjs/locale/ko'
 dayjs.extend(LocalizedFormat)
 dayjs.locale('ko')
 
-function formatDatetime(value: string) {
+function formatDatetime(value: number) {
   return dayjs(value).format('LL A hh:mm:ss')
 }
 

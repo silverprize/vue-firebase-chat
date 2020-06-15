@@ -1,0 +1,7 @@
+@import '../../scss/variables';
+
+.file {
+  &.disabled {
+    color: $grey-text-color;
+  }
+}
