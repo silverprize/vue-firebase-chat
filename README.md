@@ -1,6 +1,6 @@
-## Demo
+# Demo
 
-https://vue-firebase-chat-53f70.web.app
+https://silverprize.github.io/vue-firebase-chat
 
 # SPEC
 
