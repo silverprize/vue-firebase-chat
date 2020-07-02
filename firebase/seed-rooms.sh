@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-firebase database:get '/rooms'EXIST=$(firebase database:get '/rooms')
+EXIST=$(firebase database:get '/rooms')
+
 if [ "$EXIST" == "null" ]; then
   SEED='{
     "chatRoomStates":{
