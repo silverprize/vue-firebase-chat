@@ -80,23 +80,39 @@ touch <project root>/firebase.config.json
 
 ## Build
 
+### for firebase
+
 Output path : `<project root>/dist`
 ```shell script
 cd <project root>
 yarn build
 ```
 
+### for github page
+
+Output path : `<project root>/docs`
+```shell script
+cd <project root>
+yarn build --mode ghpage
+```
+
 ## Deploy
+
+### for firebase
 
 ```shell script
 cd <project root>
 yarn deploy
 ```
 
-firebase specific
+firebase service specific
 ```shell script
 yarn deploy --only <database|storage|hosting>
 ```
+
+### for github page
+
+push `docs` directory to master branch.
 
 # Development
 

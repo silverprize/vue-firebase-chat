@@ -16,8 +16,8 @@ function configureWebpackProduction(config) {
  *  @type { Options }
  */
 module.exports = {
-  outputDir: 'docs',
-  publicPath: '/vue-firebase-chat',
+  outputDir: process.env.OUTPUT_DIR,
+  publicPath: process.env.PUBLIC_PATH,
   chainWebpack: (config) => {
     if (isProduction) {
       configureWebpackProduction(config)
