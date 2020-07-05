@@ -43,7 +43,7 @@ async function signIn(name: string) {
   await firebaseAuth.signInAnonymously()
   const user = getCurrentUser()
   const refs = await getSessionsRef().orderByChild('name').equalTo(name).once('value')
-  let exist = refs.exists()
+  let exist = false
   refs.forEach((ref) => {
     if (ref.val().online) {
       exist = true
