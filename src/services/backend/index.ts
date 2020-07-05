@@ -27,7 +27,7 @@ enum ChatEvent {
 
 function checkUserSession(): Promise<Session | null> {
   return new Promise((resolve, reject) => {
-    const off = firebaseAuth.onAuthStateChanged(async (user) => {
+    const off = firebaseAuth.onAuthStateChanged(async () => {
       off()
       try {
         const sessionSnapshot = await getSessionRef().once('value')
@@ -42,8 +42,15 @@ function checkUserSession(): Promise<Session | null> {
 async function signIn(name: string) {
   await firebaseAuth.signInAnonymously()
   const user = getCurrentUser()
-  const exist = await getSessionsRef().orderByChild('name').equalTo(name).once('value')
-  if (exist.exists() && exist.val().online) {
+  const refs = await getSessionsRef().orderByChild('name').equalTo(name).once('value')
+  let exist = refs.exists()
+  refs.forEach((ref) => {
+    if (ref.val().online) {
+      exist = true
+      return true
+    }
+  })
+  if (exist) {
     firebaseAuth.signOut()
     throw new Error('사용중인 이름입니다.')
   }
@@ -134,11 +141,6 @@ function sendInvitation({ room, invitee }: {
       },
       createdAt: ServerValue.TIMESTAMP,
     })
-}
-
-function consumeInvitation(key: string) {
-  const { uid } = getCurrentUser()
-  return getInvitations().child(uid).child(key).remove()
 }
 
 function subscribeAuthState(callbackFn: (user: UserInfo | null) => void) {
@@ -399,5 +401,4 @@ export {
   uploadFile,
   fetchUsers,
   sendInvitation,
-  consumeInvitation,
 }
