@@ -6,7 +6,7 @@
     ]
   },
   "hosting": {
-    "public": "dist",
+    "public": "docs",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -19,8 +19,8 @@
       }
     ],
     "predeploy": [
-      "rm -rf dist",
-      "cp -r ../dist ."
+      "rm -rf docs",
+      "cp -r ../docs ."
     ]
   },
   "storage": {

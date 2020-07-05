@@ -4,8 +4,8 @@ import { GET_PROFILE, IS_CONNECTING, IS_SIGNED_IN, IS_VALID } from './getters.ty
 import { CHECK_USER_SESSION, SIGN_IN, SIGN_OUT } from '@/store/session/actions.type'
 import { RootState } from '@/store/root'
 import {
+  ChatEvent,
   checkUserSession,
-  consumeInvitation,
   Profile,
   signIn,
   signOut,
@@ -13,10 +13,8 @@ import {
   subscribeConnectionState,
   subscribeInvitation,
 } from '@/services/backend'
-import { ConfirmInvitationDialog, DialogType } from '@/store/dialog/types'
-import { REQUEST_DIALOG } from '@/store/dialog/actions.type'
-import RouteName from '@/router/route.name'
-import router from '@/router'
+import { ConfirmInvitationDialog } from '@/store/dialog/types'
+import { bus } from '@/services/bus'
 
 interface State {
   user: Profile | null;
@@ -25,7 +23,7 @@ interface State {
   unsubscribes: (() => void)[];
 }
 
-const module: Module<State, RootState> = {
+const sessionModule: Module<State, RootState> = {
   state: () => ({
     user: null,
     isConnecting: false,
@@ -86,30 +84,12 @@ function subscribeSessionEvents(context: ActionContext<State, RootState>) {
   }
   const onConnectionChanged = (connected: boolean) => {
     if (context.getters[IS_CONNECTING] && !connected) {
-      context.dispatch(REQUEST_DIALOG, {
-        dialogType: DialogType.MESSAGE,
-        params: {
-          message: '서버와 연결이 끊겼습니다.',
-          closeText: '',
-        },
-      })
+      bus.$emit(ChatEvent.DISCONNECTED)
     }
     context.commit(SET_CONNECTED, connected)
   }
   const onInvite = (invitation: ConfirmInvitationDialog.Params) => {
-    context.dispatch(REQUEST_DIALOG, {
-      dialogType: DialogType.CONFIRM_INVITATION,
-      params: {
-        ...invitation,
-        handleOk: () => {
-          consumeInvitation(invitation.id)
-          router.push({
-            name: RouteName.ChatRoom,
-            params: { roomId: invitation.room.id },
-          })
-        },
-      },
-    })
+    bus.$emit(ChatEvent.INVITATION_RECEIVED, invitation)
   }
 
   context.commit(RESET)
@@ -120,4 +100,4 @@ function subscribeSessionEvents(context: ActionContext<State, RootState>) {
   )
 }
 
-export default module
+export { sessionModule }

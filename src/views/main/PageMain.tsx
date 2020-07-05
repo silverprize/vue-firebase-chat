@@ -51,7 +51,7 @@ export default class PageMain extends Vue {
   }
 
   @WithGlobalSpinner
-  async created() {
+  async mounted() {
     try {
       const session = await this.checkUserSession()
       if (session.currentRoomId) {

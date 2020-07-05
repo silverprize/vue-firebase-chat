@@ -4,8 +4,10 @@ import { mount } from '@vue/test-utils'
 const mountDialogConfirmInvitation = () => {
   return mount(DialogConfirmInvitation, {
     propsData: {
-      inviter: 'a',
-      room: 'b',
+      params: {
+        inviter: { id: 'a', name: 'a' },
+        room: { id: 'b', name: 'b' },
+      },
     },
   })
 }

@@ -35,10 +35,6 @@ export default class PageChatRoomList extends Vue {
     this.$router.replace({ name: RouteName.Main })
   }
 
-  beforeDestroy() {
-    this.leaveLobby()
-  }
-
   @WithGlobalSpinner
   async beforeRouteEnter(to: Route, from: Route, next: RouteEnterNext<PageChatRoomList>) {
     return new Promise(resolve => {
@@ -55,6 +51,7 @@ export default class PageChatRoomList extends Vue {
     if (to.name === RouteName.Main) {
       await this.signOut()
     }
+    this.leaveLobby()
     next()
   }
 

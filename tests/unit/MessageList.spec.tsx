@@ -7,8 +7,8 @@ describe('MessageList', () => {
     const wrapper = mount(MessageList, {
       propsData: {
         messageList: [
-          { sequence: 1, content: 'a' },
-          { sequence: 2, content: 'b' },
+          { id: 1, content: 'a' },
+          { id: 2, content: 'b' },
         ],
       },
       scopedSlots: {

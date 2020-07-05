@@ -1,7 +1,7 @@
 import { StoreOptions } from 'vuex'
-import session from '@/store/session'
-import chat from '@/store/chat'
-import dialog from '@/store/dialog'
+import { sessionModule } from '@/store/session'
+import { chatModule } from '@/store/chat'
+import { dialogModule } from '@/store/dialog'
 import { IS_BUSY } from './getters.type'
 import { SET_BUSY } from './mutations.type'
 
@@ -9,11 +9,11 @@ interface RootState {
   isBusy: boolean;
 }
 
-const storeOptions: StoreOptions<RootState> = {
+const rootModule: StoreOptions<RootState> = {
   modules: {
-    session,
-    chat,
-    dialog,
+    session: sessionModule,
+    chat: chatModule,
+    dialog: dialogModule,
   },
   state: () => ({
     isBusy: true,
@@ -30,5 +30,5 @@ const storeOptions: StoreOptions<RootState> = {
 
 export {
   RootState,
+  rootModule,
 }
-export default storeOptions

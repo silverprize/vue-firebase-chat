@@ -1,6 +1,6 @@
 import { ActionContext, Module } from 'vuex'
 import { RootState } from '@/store/root'
-import { NEXT_DIALOG, REQUEST_DIALOG } from '@/store/dialog/actions.type'
+import { CLEAR_DIALOGS, NEXT_DIALOG, REQUEST_DIALOG } from '@/store/dialog/actions.type'
 import {
   ConfirmInvitationDialog,
   DialogType,
@@ -16,27 +16,25 @@ import { fetchUsers, Profile, Room } from '@/services/backend'
 import { GET_PROFILE } from '@/store/session/getters.type'
 import { GET_ROOM_INFO } from '@/store/chat/getters.type'
 
+type DialogParams = MessageDialog.Params | InvitationDialog.Params | ConfirmInvitationDialog.Params
+
 interface DialogRequestParams {
   dialogType: DialogType;
-  params: MessageDialog.Params | InvitationDialog.Params | ConfirmInvitationDialog.Params;
+  params: DialogParams;
+}
+
+interface DialogState<T> {
+  current: T | null;
+  queue: T[];
 }
 
 interface State {
-  [DialogType.MESSAGE]: {
-    current: MessageDialog.Params | null;
-    queue: MessageDialog.Params[];
-  },
-  [DialogType.INVITATION]: {
-    current: InvitationDialog.Params | null;
-    queue: InvitationDialog.Params[];
-  },
-  [DialogType.CONFIRM_INVITATION]: {
-    current: ConfirmInvitationDialog.Params | null;
-    queue: ConfirmInvitationDialog.Params[];
-  },
+  [DialogType.MESSAGE]: DialogState<MessageDialog.Params>;
+  [DialogType.INVITATION]: DialogState<InvitationDialog.Params>,
+  [DialogType.CONFIRM_INVITATION]: DialogState<ConfirmInvitationDialog.Params>,
 }
 
-const dialog: Module<State, RootState> = {
+const dialogModule: Module<State, RootState> = {
   state: () => ({
     [DialogType.MESSAGE]: {
       current: null,
@@ -57,6 +55,11 @@ const dialog: Module<State, RootState> = {
     [GET_CURRENT_CONFIRM_INVITATION_DIALOG]: (state) => state[DialogType.CONFIRM_INVITATION].current,
   },
   actions: {
+    [CLEAR_DIALOGS]({ state }) {
+      clear(state[DialogType.MESSAGE])
+      clear(state[DialogType.INVITATION])
+      clear(state[DialogType.CONFIRM_INVITATION])
+    },
     [REQUEST_DIALOG](context: ActionContext<State, RootState>, { dialogType, params }: DialogRequestParams) {
       switch (dialogType) {
         case DialogType.MESSAGE:
@@ -119,5 +122,9 @@ function showMessageDialog(context: ActionContext<State, RootState>, params: Mes
   })
 }
 
-export default dialog
-export { DialogRequestParams }
+function clear(state: DialogState<any>) {
+  state.queue = []
+  state.current = null
+}
+
+export { dialogModule, DialogRequestParams }

@@ -1,6 +1,7 @@
 import { ChatUser } from '@/services/backend'
+import { DialogRequestParams } from '@/store/dialog/index'
 
-declare namespace InvitationDialog {
+export declare namespace InvitationDialog {
   export interface Params {
     usersPromise?: Promise<ChatUser[]>;
     handleOk?: (uid: string) => void;
@@ -8,19 +9,18 @@ declare namespace InvitationDialog {
   }
 }
 
-declare namespace MessageDialog {
+export declare namespace MessageDialog {
   export interface Params {
     message: string[] | string;
-    okText: string;
-    closeText: string;
+    okText?: string;
+    closeText?: string;
     handleOk?: () => void;
     handleClose?: () => void;
   }
 }
 
-declare namespace ConfirmInvitationDialog {
+export declare namespace ConfirmInvitationDialog {
   export interface Params {
-    id: string;
     inviter: { id: string; name: string; };
     room: { id: string; name: string; };
     handleOk?: (roomId: string) => void;
@@ -28,10 +28,12 @@ declare namespace ConfirmInvitationDialog {
   }
 }
 
-enum DialogType {
+export enum DialogType {
   MESSAGE = 'message',
   INVITATION = 'invitation',
   CONFIRM_INVITATION = 'confirm',
 }
 
-export { DialogType, InvitationDialog, MessageDialog, ConfirmInvitationDialog }
+export interface RequestDialog {
+  (params: DialogRequestParams): Promise<void>
+}

@@ -25,10 +25,10 @@ import { WithGlobalSpinner } from '@/decorators/WithGlobalSpinner'
 import { RouteEnterNext, RouteNext } from '@/types/common'
 import { GET_PROFILE } from '@/store/session/getters.type'
 import { ChatUser, Message, Profile, Room } from '@/services/backend'
-import { DialogRequestParams } from '@/store/dialog'
-import { DialogType, InvitationDialog } from '@/store/dialog/types'
+import { DialogType, RequestDialog } from '@/store/dialog/types'
 import ChatRoomPeoplePopup from '@/components/ChatRoomPeoplePopup/ChatRoomPeoplePopup'
 import { REQUEST_DIALOG } from '@/store/dialog/actions.type'
+import { DispatchMessage, EnterRoom, LeaveRoom, SendInvitation } from '@/store/chat/types'
 
 @Component
 export default class PageChatRoom extends Vue {
@@ -54,19 +54,19 @@ export default class PageChatRoom extends Vue {
   readonly messages!: Message[]
 
   @Action(ENTER_ROOM)
-  readonly enterRoom!: (roomId: string) => Promise<void>
+  readonly enterRoom!: EnterRoom
 
   @Action(LEAVE_ROOM)
-  readonly leaveRoom!: () => Promise<void>
+  readonly leaveRoom!: LeaveRoom
 
   @Action(DISPATCH_MESSAGE)
-  readonly dispatchMessage!: (message: Message.Params) => Promise<void>
+  readonly dispatchMessage!: DispatchMessage
 
   @Action(SEND_INVITATION)
-  readonly sendInvitation!: (uid: string) => Promise<void>
+  readonly sendInvitation!: SendInvitation
 
   @Action(REQUEST_DIALOG)
-  readonly requestDialog!: (params: DialogRequestParams) => void
+  readonly requestDialog!: RequestDialog
 
   sendMessageQueue: Promise<void> = Promise.resolve()
 
@@ -83,7 +83,7 @@ export default class PageChatRoom extends Vue {
       dialogType: DialogType.INVITATION,
       params: {
         handleOk: this.handleSendInvitationOk,
-      } as InvitationDialog.Params,
+      },
     })
   }
 
@@ -132,7 +132,7 @@ export default class PageChatRoom extends Vue {
   }
 
   @Watch('room')
-  async onRoomChanged(newRoom: Room) {
+  async watchRoom(newRoom: Room) {
     if (newRoom.id) {
       await this.$nextTick()
       this.inputPanel.focusInput()

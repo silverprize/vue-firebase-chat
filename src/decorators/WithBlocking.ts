@@ -7,7 +7,7 @@ const storage: Dictionary<any> = {}
 const factory = createDecorator((options, prop) => {
   const method = options.methods?.[prop]
   if (!method) {
-    throw new Error(`${prop} of ${method}`)
+    throw new Error(`${prop} is ${method}`)
   }
 
   options.methods![prop] = function (...args: any[]) {

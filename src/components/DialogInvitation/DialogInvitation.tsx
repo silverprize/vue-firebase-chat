@@ -35,7 +35,7 @@ export default class DialogInvitation extends tsx.Component<Props, Events> {
   }
 
   @WithGlobalSpinner
-  async mounted() {
+  async created() {
     const users = await this.params.usersPromise
     this.users = users || []
     if (this.users.length) {
@@ -68,6 +68,7 @@ export default class DialogInvitation extends tsx.Component<Props, Events> {
                 <option
                   key={chatUser.id}
                   value={chatUser.id}
+                  data-test="option"
                 >
                   {chatUser.name}
                 </option>

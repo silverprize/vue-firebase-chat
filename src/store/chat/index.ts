@@ -22,7 +22,7 @@ import {
 } from '@/store/chat/actions.type'
 import { RootState } from '@/store/root'
 import {
-  ChatRoomEvent,
+  ChatEvent,
   ChatUser,
   dispatchMessage,
   Message,
@@ -46,7 +46,7 @@ interface State {
 const SubRoomsKey = 'RoomsKey'
 const SubRoomKey = 'RoomKey'
 const dummyRoom = { id: '', order: -1, name: '', countPeople: 0 }
-const chat: Module<State, RootState> = {
+const chatModule: Module<State, RootState> = {
   state: () => ({
     rooms: [],
     people: [],
@@ -150,30 +150,30 @@ async function subscribeRoomEvent(context: ActionContext<State, RootState>, room
   }
   const unsubscribePromise = subscribeChatRoom(roomId, (event, data) => {
     switch (event) {
-      case ChatRoomEvent.ROOM_UPDATED:
+      case ChatEvent.ROOM_UPDATED:
         context.commit(SET_ROOM, data)
         break
-      case ChatRoomEvent.USER_JOINED:
+      case ChatEvent.USER_JOINED:
         context.commit(
           ADD_MESSAGE,
           createSystemMessage(`${(data as ChatUser).name}님이 입장했습니다.`),
         )
         context.commit(ADD_USER, data)
         break
-      case ChatRoomEvent.USER_LEAVE:
+      case ChatEvent.USER_LEAVE:
         context.commit(
           ADD_MESSAGE,
           createSystemMessage(`${(data as ChatUser).name}님이 퇴장했습니다.`),
         )
         context.commit(REMOVE_USER, data)
         break
-      case ChatRoomEvent.NEW_MESSAGE:
+      case ChatEvent.NEW_MESSAGE:
         context.commit(ADD_MESSAGE, data)
         break
-      case ChatRoomEvent.IMAGE_UPLOADED:
+      case ChatEvent.IMAGE_UPLOADED:
         context.commit(IMAGE_UPLOADED, data)
         break
-      case ChatRoomEvent.USER_LIST_LOADED:
+      case ChatEvent.USER_LIST_LOADED:
         context.commit(SET_PEOPLE, data)
         break
     }
@@ -192,4 +192,4 @@ async function unsubscribeEvents(context: ActionContext<State, RootState>, keys:
   }))
 }
 
-export default chat
+export { chatModule }

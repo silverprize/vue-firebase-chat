@@ -1,63 +1,56 @@
-import Vue from 'vue'
+import Vuex, { Store } from 'vuex'
+import { createLocalVue, mount } from '@vue/test-utils'
+import DialogContainer from '@/components/DialogContainer/DialogContainer'
+import { rootModule } from '@/store/root'
+import { REQUEST_DIALOG } from '@/store/dialog/actions.type'
+import { DialogType } from '@/store/dialog/types'
+import DialogMessage from '@/components/DialogMessage/DialogMessage'
+import DialogInvitation from '@/components/DialogInvitation/DialogInvitation'
+import DialogConfirmInvitation from '@/components/DialogConfirmInvitation/DialogConfirmInvitation'
 
-jest.mock('@/services/eventBus', () => ({
-  listen(this: any, vm: Vue, event: string, method: Function) {
-    this.$on(event, method)
-    vm.$on('hook:destroyed', () => {
-      this.$off(event, method)
-    })
-  },
-  $on: jest.fn(),
-  $off: jest.fn(),
-}))
+const localVue = createLocalVue()
+localVue.use(Vuex)
 
-// const baseMockStubs = {
-//   RouterView: '<div/>',
-// }
+function mountDialogContainer() {
+  return mount(DialogContainer, {
+    store: new Store(rootModule),
+  })
+}
 
 describe('DialogContainer.tsx', () => {
-  // TODO unit test migration
-  // it('PageChatBase 컴포넌트 인스턴스가 만들어지면 소켓이벤트(입장/퇴장/초대/연결끊김)와 eventBus이벤트(초대 열기) 리스너 등록.', () => {
-  //   const setSocketEventListener = jest.fn()
-  //   const mockOptions: MountOptions<PageChatBase> = {
-  //     stubs: {
-  //       ...baseMockStubs,
-  //     },
-  //     methods: {
-  //       setSocketEventListener,
-  //     },
-  //   }
-  //   const wrapper = mount(PageChatBase, mockOptions)
-  //   expect(eventBus.$on).toHaveBeenCalledWith(OPEN_INVITATION_DIALOG, wrapper.vm.openInvitationDialog)
-  // })
+  it('메시지 다이얼로그.', async () => {
+    const wrapper = mountDialogContainer()
+    await wrapper.vm.$store.dispatch(REQUEST_DIALOG, {
+      dialogType: DialogType.MESSAGE,
+      params: {
+        message: 'message message message message',
+      },
+    })
+    expect(wrapper.findComponent(DialogMessage)).toBeTruthy()
+  })
 
-  // TODO unit test migration
-  // it('PageChatBase 컴포넌트 인스턴스가 소멸하면 소켓이벤트와 eventBus 리스너 제거.', async () => {
-  //   const setSocketEventListener = jest.fn()
-  //   const removeSocketEventListener = jest.fn()
-  //   const mockOptions: MountOptions<PageChatBase> = {
-  //     stubs: {
-  //       ...baseMockStubs,
-  //     },
-  //     methods: {
-  //       setSocketEventListener,
-  //       removeSocketEventListener,
-  //     },
-  //   }
-  //   const wrapper = mount(PageChatBase, mockOptions)
-  //   wrapper.vm.$destroy()
-  //   await wrapper.vm.$nextTick()
-  //   expect(eventBus.$off).toHaveBeenCalledWith(OPEN_INVITATION_DIALOG, wrapper.vm.openInvitationDialog)
-  // })
+  it('초대 발송 다이얼로그', async () => {
+    const wrapper = mountDialogContainer()
+    await wrapper.vm.$store.dispatch(REQUEST_DIALOG, {
+      dialogType: DialogType.INVITATION,
+      params: {
+        usersPromise: Promise.resolve([
+          { id: 'a', name: 'a' },
+        ]),
+      },
+    })
+    expect(wrapper.findComponent(DialogInvitation)).toBeTruthy()
+  })
 
-  // TODO unit test migration
-  // it('서버 연결이 끊기면 알림 다이얼로그 호출.', () => {
-  //   const mockOptions: MountOptions<PageChatBase> = {
-  //     stubs: {
-  //       ...baseMockStubs,
-  //     },
-  //   }
-  //   const wrapper = mount(PageChatBase, mockOptions)
-  //   expect(wrapper.vm.dialogProps[Dialog.MESSAGE].visible).toBeTruthy()
-  // })
+  it('초대 수신 다이얼로그', async () => {
+    const wrapper = mountDialogContainer()
+    await wrapper.vm.$store.dispatch(REQUEST_DIALOG, {
+      dialogType: DialogType.CONFIRM_INVITATION,
+      params: {
+        inviter: {},
+        room: {},
+      },
+    })
+    expect(wrapper.findComponent(DialogConfirmInvitation)).toBeTruthy()
+  })
 })

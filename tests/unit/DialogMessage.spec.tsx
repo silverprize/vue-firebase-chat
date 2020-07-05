@@ -5,12 +5,14 @@ describe('DialogMessage', () => {
   test('props', () => {
     const wrapper = mount(DialogMessage, {
       propsData: {
-        okLabel: 'okok',
-        closeLabel: null,
-        messageList: [
-          'ab',
-          'cd',
-        ],
+        params: {
+          okText: 'okok',
+          closeText: null,
+          message: [
+            'ab',
+            'cd',
+          ],
+        },
       },
     })
 

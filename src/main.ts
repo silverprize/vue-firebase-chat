@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import { Component } from 'vue-property-decorator'
 import App from './App'
-import router from './router'
-import store from './store'
+import { router } from './router'
+import { store } from './store'
 
 Vue.config.productionTip = false
 

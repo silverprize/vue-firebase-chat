@@ -18,7 +18,7 @@ describe('VModel', () => {
   it('footer 버튼 이벤트 검사', () => {
     const wrapper = mount(VModal)
 
-    wrapper.findAll(VButton).trigger('click')
+    wrapper.findAllComponents(VButton).trigger('click')
 
     expect(wrapper.emitted('ok')).toBeTruthy()
     expect(wrapper.emitted('close')).toBeTruthy()
@@ -32,7 +32,7 @@ describe('VModel', () => {
       },
     })
 
-    expect(wrapper.findAll(VButton).length).toBe(1)
-    expect(wrapper.findAll(VButton).at(0).text()).toBe('ok-test')
+    expect(wrapper.findAllComponents(VButton).length).toBe(1)
+    expect(wrapper.findAllComponents(VButton).at(0).text()).toBe('ok-test')
   })
 })

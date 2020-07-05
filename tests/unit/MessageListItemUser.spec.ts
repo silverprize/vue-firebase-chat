@@ -24,7 +24,7 @@ describe('MessageListItemUser', () => {
         message: {
           content: 'a',
           contentType: Message.ContentType.Image,
-          senderId: 'b',
+          sender: { id: 'b', name: 'b' },
         },
       },
     })

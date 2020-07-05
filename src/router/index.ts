@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter, { Location, Route } from 'vue-router'
 import routerOptions from './options'
 import RouteName from '@/router/route.name'
-import store from '@/store'
+import { store } from '@/store'
 import { IS_SIGNED_IN } from '@/store/session/getters.type'
 
 Vue.use(VueRouter)
@@ -21,4 +21,4 @@ async function checkSession(to: Route, from: Route, next: (to?: Location) => voi
 // 서버 연결중이 아니면 접속 페이지로 이동하도록 확인
 router.beforeEach(checkSession)
 
-export default router
+export { router }

@@ -14,13 +14,15 @@ const firebaseAuth = firebaseApp.auth()
 const firebaseDatabase = firebaseApp.database()
 const firebaseStorage = firebaseApp.storage()
 
-enum ChatRoomEvent {
-  ROOM_UPDATED,
-  USER_LIST_LOADED,
-  USER_JOINED,
-  USER_LEAVE,
-  NEW_MESSAGE,
-  IMAGE_UPLOADED,
+enum ChatEvent {
+  ROOM_UPDATED = 'ROOM_UPDATED',
+  USER_LIST_LOADED = 'USER_LIST_LOADED',
+  USER_JOINED = 'USER_JOINED',
+  USER_LEAVE = 'USER_LEAVE',
+  NEW_MESSAGE = 'NEW_MESSAGE',
+  IMAGE_UPLOADED = 'IMAGE_UPLOADED',
+  DISCONNECTED = 'DISCONNECTED',
+  INVITATION_RECEIVED = 'INVITATION_RECEIVED',
 }
 
 function checkUserSession(): Promise<Session | null> {
@@ -41,7 +43,7 @@ async function signIn(name: string) {
   await firebaseAuth.signInAnonymously()
   const user = getCurrentUser()
   const exist = await getSessionsRef().orderByChild('name').equalTo(name).once('value')
-  if (exist.exists()) {
+  if (exist.exists() && exist.val().online) {
     firebaseAuth.signOut()
     throw new Error('사용중인 이름입니다.')
   }
@@ -178,7 +180,7 @@ function subscribeChatRooms(roomsCallbackFn: (rooms: Room[]) => void): Promise<(
   })
 }
 
-async function subscribeChatRoom(roomId: string, roomCallbackFn: (event: ChatRoomEvent, data: Room | ChatUser | Message | ChatUser[]) => void) {
+async function subscribeChatRoom(roomId: string, roomCallbackFn: (event: ChatEvent, data: Room | ChatUser | Message | ChatUser[]) => void) {
   const { uid } = getCurrentUser()
   const chatRoomUsersRef = getChatRoomUsersRef(roomId)
   const userSnapshots = await chatRoomUsersRef.once('value')
@@ -201,12 +203,12 @@ async function subscribeChatRoom(roomId: string, roomCallbackFn: (event: ChatRoo
       id: snapshot.key,
     })
   })
-  roomCallbackFn(ChatRoomEvent.USER_LIST_LOADED, users)
+  roomCallbackFn(ChatEvent.USER_LIST_LOADED, users)
 
   chatRoomStateRef.on('value', (snapshot) => {
     const data = snapshot.val()
     roomCallbackFn(
-      ChatRoomEvent.ROOM_UPDATED,
+      ChatEvent.ROOM_UPDATED,
       {
         ...data,
         id: snapshot.key,
@@ -216,14 +218,14 @@ async function subscribeChatRoom(roomId: string, roomCallbackFn: (event: ChatRoo
   chatRoomUsersQuery.on('child_added', (snapshot) => {
     const data = snapshot.val()
     roomCallbackFn(
-      ChatRoomEvent.USER_JOINED,
+      ChatEvent.USER_JOINED,
       data,
     )
   })
   chatRoomUsersQuery.on('child_removed', (snapshot) => {
     const data = snapshot.val()
     roomCallbackFn(
-      ChatRoomEvent.USER_LEAVE,
+      ChatEvent.USER_LEAVE,
       data,
     )
   })
@@ -234,7 +236,7 @@ async function subscribeChatRoom(roomId: string, roomCallbackFn: (event: ChatRoo
       id: snapshot.key,
     }
     roomCallbackFn(
-      ChatRoomEvent.NEW_MESSAGE,
+      ChatEvent.NEW_MESSAGE,
       message,
     )
   })
@@ -242,7 +244,7 @@ async function subscribeChatRoom(roomId: string, roomCallbackFn: (event: ChatRoo
     const data = snapshot.val()
     if (data.contentType === ContentType.Image && data.content) {
       roomCallbackFn(
-        ChatRoomEvent.IMAGE_UPLOADED,
+        ChatEvent.IMAGE_UPLOADED,
         {
           ...data,
           id: snapshot.key,
@@ -384,7 +386,7 @@ async function removeUserFromRoom(roomId: string) {
 
 export * from './types'
 export {
-  ChatRoomEvent,
+  ChatEvent,
   checkUserSession,
   signIn,
   signOut,

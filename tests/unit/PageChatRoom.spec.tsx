@@ -1,8 +1,10 @@
 import { createLocalVue, mount, ThisTypedMountOptions } from '@vue/test-utils'
 import PageChatRoom from '@/views/chat-room/PageChatRoom'
 import Vuex from 'vuex'
-import rootModule from '@/store/root'
+import { rootModule } from '@/store/root'
 import { Message } from '@/services/backend'
+import RouteName from '@/router/route.name'
+import { DialogType } from '@/store/dialog/types'
 
 const mountPageChatRoom = ({
   methods = {},
@@ -10,63 +12,60 @@ const mountPageChatRoom = ({
 }: ThisTypedMountOptions<PageChatRoom> = {}) => {
   const localVue = createLocalVue()
   localVue.use(Vuex)
-  return mount(PageChatRoom, {
+  const mock = PageChatRoom.extend({
+    methods,
+  })
+  return mount<PageChatRoom>(mock, {
     localVue,
     store: new Vuex.Store(rootModule),
-    methods,
     computed,
   })
 }
 
 describe('PageChatRoom', () => {
-  // TODO unit test migration
-  // it('채팅방 페이지 진입후 소켓이벤트(새메시지/입장/퇴장/이미지업로드완료) 리스너 등록하고 서버에 입장 요청.', async () => {
-  //   const room = 'chatRoom'
-  //   const dispatchJoin = jest.fn()
-  //   const setSocketEventListener = jest.fn()
-  //   const wrapper = mountPageChatRoom({
-  //     methods: {
-  //       setSocketEventListener,
-  //       dispatchJoin,
-  //     },
-  //   })
-  //
-  //   await wrapper.vm.beforeRouteEnter(
-  //     { params: { room } } as any,
-  //     null as never,
-  //     (callback: Function) => callback(wrapper.vm),
-  //   )
-  //
-  //   expect(dispatchJoin).toHaveBeenCalledWith(room)
-  // })
+  it('채팅방 입장.', async () => {
+    const roomId = 'chatRoom'
+    const enterRoom = jest.fn()
+    const wrapper = mountPageChatRoom({
+      methods: {
+        enterRoom,
+      },
+    })
 
-  // TODO unit test migration
-  // it('채팅방 페이지를 떠날때 소켓이벤트 리스너 제거하고 서버에 퇴장 요청.', async () => {
-  //   const dispatchLeave = jest.fn()
-  //   const setSocketEventListener = jest.fn()
-  //   const removeSocketEventListener = jest.fn()
-  //   const wrapper = mountPageChatRoom({
-  //     methods: {
-  //       setSocketEventListener,
-  //       removeSocketEventListener,
-  //       dispatchLeave,
-  //     },
-  //   })
-  //
-  //   await wrapper.vm.beforeRouteLeave(
-  //     { name: RouteName.ChatRoomList } as any,
-  //     null as never,
-  //     () => {},
-  //   )
-  //
-  //   expect(dispatchLeave).toHaveBeenCalled()
-  // })
+    await wrapper.vm.beforeRouteEnter(
+      { params: { roomId } } as any,
+      null as never,
+      (callback: Function) => callback(wrapper.vm),
+    )
 
-  it('"메시지"를 입력하고 전송 버튼 클릭 또는 엔터키 치면 서버에 전송.', async () => {
+    expect(enterRoom).toHaveBeenCalledWith(roomId)
+  })
+
+  it('채팅방 나감.', async () => {
+    const leaveRoom = jest.fn()
+    const wrapper = mountPageChatRoom({
+      methods: {
+        leaveRoom,
+      },
+    })
+
+    await wrapper.vm.beforeRouteLeave(
+      { name: RouteName.ChatRoomList } as any,
+      null as never,
+      () => {},
+    )
+
+    expect(leaveRoom).toHaveBeenCalled()
+  })
+
+  it('메시지 발송.', async () => {
     const messageClick = '클릭 전송 메시지'
     const messageEnter = '엔터 전송 메시지'
     const dispatchMessage = jest.fn()
     const wrapper = mountPageChatRoom({
+      computed: {
+        room: () => ({ id: 'room' }),
+      },
       methods: {
         dispatchMessage,
       },
@@ -79,32 +78,42 @@ describe('PageChatRoom', () => {
     const getExpectMessage = (content: string) => ({
       content,
       contentType: Message.ContentType.Text,
-      senderId: '',
     })
 
     await changeText(messageEnter)
     expect((wrapper.find('textarea').element as any).value).toEqual(messageEnter)
 
     wrapper.find('textarea').trigger('keydown.enter')
+    await wrapper.vm.$nextTick()
     expect(dispatchMessage).toHaveBeenNthCalledWith(1, getExpectMessage(messageEnter))
 
     await changeText(messageClick)
     expect((wrapper.find('textarea').element as any).value).toEqual(messageClick)
 
     wrapper.find('[type="submit"]').trigger('click')
+    await wrapper.vm.$nextTick()
     expect(dispatchMessage).toHaveBeenNthCalledWith(2, getExpectMessage(messageClick))
   })
 
-  it('초대 메뉴를 누르면 요청자가 속한 방이름을 파라미터로 초대요청 다이얼로그 오픈 이벤트 발송.(eventBus.send)', () => {
-    const room = 'room'
+  it('초대 발송.', () => {
+    const requestDialog = jest.fn()
+    const id = 'room'
     const wrapper = mountPageChatRoom({
       computed: {
-        roomName: () => room,
+        room: () => ({ id }),
+      },
+      methods: {
+        requestDialog,
       },
     })
 
     wrapper.findAll('.chat-frame-input-panel__menu-item').at(1).trigger('click')
 
-    // expect(eventBus.send).toHaveBeenCalledWith(OPEN_INVITATION_DIALOG, room)
+    expect(requestDialog).toHaveBeenCalledWith({
+      dialogType: DialogType.INVITATION,
+      params: {
+        handleOk: wrapper.vm.handleSendInvitationOk,
+      },
+    })
   })
 })

@@ -1,46 +1,40 @@
-import { createLocalVue, mount, ThisTypedMountOptions } from '@vue/test-utils'
-import VueRouter, { Route } from 'vue-router'
+import { mount, ThisTypedMountOptions } from '@vue/test-utils'
 import PageChatRoomList from '@/views/chat-room-list/PageChatRoomList'
 import RouteName from '@/router/route.name'
+import { Route } from 'vue-router'
 
 const mountPageRoomList = ({
-  localVue,
   mocks,
   computed,
   router,
   methods = {},
 }: ThisTypedMountOptions<PageChatRoomList> = {}) => {
-  return mount(PageChatRoomList, {
-    localVue,
+  const mock = PageChatRoomList.extend({
+    methods,
+  })
+  return mount<PageChatRoomList>(mock, {
     mocks,
     computed: {
-      roomList: jest.fn(() => []),
+      rooms: jest.fn(() => []),
       ...computed,
     },
     router,
-    methods: {
-      updateRoomList: jest.fn(),
-      ...methods,
+    stubs: {
+      'router-link': true,
     },
   })
 }
 
 describe('PageChatRoomList.tsx', () => {
   it('방목록에 방 2개 렌더링.', () => {
-    const localVue = createLocalVue()
-    localVue.use(VueRouter)
     const roomListData = [
       { name: 'Moon', countPeople: 10 },
       { name: 'Pluto', countPeople: 1 },
     ]
     const wrapper = mountPageRoomList({
-      localVue,
       computed: {
-        roomList: () => roomListData,
+        rooms: () => roomListData,
       },
-      router: new VueRouter({
-        routes: [{ path: '/', name: RouteName.ChatRoom }],
-      }),
     })
     expect(wrapper.findAll('.chat-room-list-room').length).toEqual(2)
   })
@@ -54,34 +48,48 @@ describe('PageChatRoomList.tsx', () => {
       },
     })
     wrapper.find('button').trigger('click')
-    expect(wrapper.vm.$router.replace).toHaveBeenCalled()
+    expect(wrapper.vm.$router.replace).toBeCalledWith({ name: RouteName.Main })
   })
 
-  it('채팅방 목록 페이지 진입후 서버에 방목록 요청(updateRoomList).', async () => {
-    const wrapper = mountPageRoomList()
-    expect(wrapper.vm.$options!.methods!.updateRoomList).toHaveBeenCalled()
-  })
-
-  it('채팅방 목록에서 페이지에서 나가면 서버 연결 해제 호출(disconnect).', async () => {
+  it('채팅방 목록 페이지 진입하면 방목록 로드.', async () => {
     const wrapper = mountPageRoomList({
       methods: {
-        disconnect: jest.fn(),
+        enterLobby: jest.fn(),
       },
     })
+    await wrapper.vm.beforeRouteEnter(
+      { name: RouteName.Main } as Route,
+      null as never,
+      (cb) => cb(wrapper.vm),
+    )
+    expect(wrapper.vm.$options!.methods!.enterLobby).toHaveBeenCalled()
+  })
+
+  it('채팅방 목록 페이지를 떠나면 서버 연결 해제.', async () => {
+    const wrapper = mountPageRoomList({
+      methods: {
+        signOut: jest.fn(),
+        leaveLobby: jest.fn(),
+      },
+    })
+
     await wrapper.vm.beforeRouteLeave(
       { name: RouteName.Main } as Route,
       null as never,
       () => {},
     )
-    expect(wrapper.vm.$options!.methods!.disconnect).toHaveBeenCalled()
+    expect(wrapper.vm.$options!.methods!.leaveLobby).toHaveBeenCalled()
   })
 
-  it('채팅방 목록에서 채팅방 선택하면 메소드로 채팅방 페이지로 이동($router.replace).', async () => {
+  it('채팅방 목록에서 채팅방으로 이동.', async () => {
     const wrapper = mountPageRoomList({
       mocks: {
         $router: {
           replace: jest.fn(),
         },
+      },
+      methods: {
+        leaveLobby: jest.fn(),
       },
     })
     await wrapper.vm.beforeRouteLeave(
